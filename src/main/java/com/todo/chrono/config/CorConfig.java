@@ -35,7 +35,7 @@ public class CorConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080","http://localhost:5174","http://localhost:3000","https://swd-392-client-indol.vercel.app","https://www.exe201.space/")); // Swagger hoặc client
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080","http://localhost:5174","http://localhost:3000","https://swd-392-client-indol.vercel.app","https://www.exe201.space")); // Swagger hoặc client
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

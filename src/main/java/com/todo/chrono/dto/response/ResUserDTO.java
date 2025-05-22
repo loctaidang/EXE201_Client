@@ -20,7 +20,9 @@ public class ResUserDTO {
     private LocalDateTime premiumExpiry;
 
     private boolean deleted;
-    
+
+    private String imageUrl;
+
     private Role role;
 
 }

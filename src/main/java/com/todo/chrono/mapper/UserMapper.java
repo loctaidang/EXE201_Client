@@ -13,6 +13,7 @@ public class UserMapper {
         userDTO.setPassword(user.getPassword());
         userDTO.setRole(user.getRole());
         userDTO.setPremiumExpiry(user.getPremiumExpiry());
+        userDTO.setImageUrl(user.getImageUrl());
         userDTO.setDeleted(user.isDeleted());
         return userDTO;
 
@@ -25,6 +26,7 @@ public class UserMapper {
         user.setRole(userDTO.getRole());
         user.setPremiumExpiry(userDTO.getPremiumExpiry());
         user.setDeleted(userDTO.isDeleted());
+        user.setImageUrl(userDTO.getImageUrl());
         return user;
 
     }

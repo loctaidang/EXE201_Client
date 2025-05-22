@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         User user = UserMapper.mapToUser(userDTO);
         user.setRole(userDTO.getRole());
+        user.setImageUrl(userDTO.getImageUrl());
         User savedUser= userRepository.save(user);
         return UserMapper.mapToUserDTO(savedUser);
     }
@@ -62,6 +63,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()-> new RuntimeException("User "+user_id+" not found"));
         user.setUsername(updateUser.getUsername());
         user.setRole(updateUser.getRole());
+        user.setImageUrl(updateUser.getImageUrl());
         User updateUserObj = userRepository.save(user);
         return UserMapper.mapToUserDTO(updateUserObj);
     }
@@ -93,6 +95,7 @@ public class UserServiceImpl implements UserService {
         res.setRole(user.getRole());
         res.setDeleted(user.isDeleted());
         res.setPremiumExpiry(user.getPremiumExpiry());
+        res.setImageUrl(user.getImageUrl());
         return res;
     }
     @Override
@@ -103,6 +106,7 @@ public class UserServiceImpl implements UserService {
         res.setRole(user.getRole());
         res.setDeleted(user.isDeleted());
         res.setPremiumExpiry(user.getPremiumExpiry());
+        res.setImageUrl(user.getImageUrl());
         return res;
     }
     @Override
@@ -113,6 +117,7 @@ public class UserServiceImpl implements UserService {
         res.setRole(user.getRole());
         res.setDeleted(user.isDeleted());
         res.setPremiumExpiry(user.getPremiumExpiry());
+        res.setImageUrl(user.getImageUrl());
         return res;
     }
 

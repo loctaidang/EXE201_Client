@@ -17,4 +17,6 @@ public class ResUpdateUserDTO {
     private Role role;
 
     private boolean deleted;
+
+    private String imageUrl;
 }

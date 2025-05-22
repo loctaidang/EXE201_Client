@@ -6,7 +6,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Where;
 import java.time.LocalDateTime;
-
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Getter
 @Setter
 @Builder
@@ -26,9 +27,16 @@ public class User {
     @Column(name = "password")
     private String password;
     @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
+    private boolean deleted = false;    
     @Column(name = "premium_expiry")
     private LocalDateTime premiumExpiry;
+    @Column(name = "image_url")
+    private String imageUrl;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    //relationship
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
+    private List<Workspace> workspaces;
 }

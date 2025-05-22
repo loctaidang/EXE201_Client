@@ -1,30 +1,27 @@
 package com.todo.chrono.dto.request;
 
-
-import com.todo.chrono.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class TaskDTO {
     private int id;
 
-    private String username;
+    private int workspaceId;
 
-    private String password;
+    private String title;
 
-    private boolean deleted;
+    private String status;
 
-    private LocalDateTime premiumExpiry;     
+    private LocalDateTime dueDate;
 
-    private String imageUrl;
-
-    private Role role;
+    private LocalDateTime createdAt;
 
 }

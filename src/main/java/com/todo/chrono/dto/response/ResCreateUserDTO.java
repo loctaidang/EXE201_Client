@@ -16,6 +16,8 @@ public class ResCreateUserDTO {
 
     private Role role;
 
+    private String imageUrl;
+
     private boolean deleted;
 
 }

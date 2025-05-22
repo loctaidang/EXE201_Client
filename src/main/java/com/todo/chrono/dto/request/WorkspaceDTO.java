@@ -1,7 +1,5 @@
 package com.todo.chrono.dto.request;
 
-
-import com.todo.chrono.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,19 +10,15 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class WorkspaceDTO {
     private int id;
 
-    private String username;
+    private int userId;
 
-    private String password;
+    private String name;
 
-    private boolean deleted;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime premiumExpiry;     
-
-    private String imageUrl;
-
-    private Role role;
+    private LocalDateTime updatedAt;
 
 }

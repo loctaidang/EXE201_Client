@@ -3,6 +3,7 @@ package com.todo.chrono.mapper;
 
 import com.todo.chrono.dto.request.UserDTO;
 import com.todo.chrono.entity.User;
+import com.todo.chrono.dto.request.UserCreateDTO;
 
 public class UserMapper {
 
@@ -28,6 +29,11 @@ public class UserMapper {
         user.setDeleted(userDTO.isDeleted());
         user.setImageUrl(userDTO.getImageUrl());
         return user;
-
+    }
+    public static User mapToUser(UserCreateDTO userCreateDTO){
+        User user = new User();
+        user.setUsername(userCreateDTO.getUsername());
+        user.setPassword(userCreateDTO.getPassword());
+        return user;
     }
 }

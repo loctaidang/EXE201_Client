@@ -2,6 +2,7 @@ package com.todo.chrono.mapper;
 
 import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.entity.Workspace;
+import com.todo.chrono.dto.request.WorkspaceCreateDTO;
 
 public class WorkspaceMapper {
 
@@ -23,5 +24,10 @@ public class WorkspaceMapper {
         workspace.setUpdatedAt(workspaceDTO.getUpdatedAt());
         return workspace;
 
+    }
+    public static Workspace mapToWorkspace(WorkspaceCreateDTO workspaceCreateDTO){
+        Workspace workspace = new Workspace();
+        workspace.setName(workspaceCreateDTO.getName());
+        return workspace;
     }
 }

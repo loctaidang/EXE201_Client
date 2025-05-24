@@ -2,6 +2,7 @@ package com.todo.chrono.mapper;
 
 import com.todo.chrono.dto.request.TaskDTO;
 import com.todo.chrono.entity.Task;
+import com.todo.chrono.dto.request.TaskCreateDTO;
 
 public class TaskMapper {
 
@@ -23,6 +24,13 @@ public class TaskMapper {
         task.setStatus(taskDTO.getStatus());
         task.setDueDate(taskDTO.getDueDate());
         task.setCreatedAt(taskDTO.getCreatedAt());
+        return task;
+    }
+    public static Task mapToTask(TaskCreateDTO taskCreateDTO){
+        Task task = new Task();
+        task.setTitle(taskCreateDTO.getTitle());
+        task.setStatus(taskCreateDTO.getStatus());
+        task.setDueDate(taskCreateDTO.getDueDate());
         return task;
     }
 }

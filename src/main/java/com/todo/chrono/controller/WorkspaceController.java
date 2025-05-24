@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.service.workspaceService.WorkspaceService;
 import com.todo.chrono.dto.request.UserDTO;
+import com.todo.chrono.dto.request.WorkspaceCreateDTO;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class WorkspaceController {
     @PostMapping("/user/{user_id}")
     @PreAuthorize("hasRole('FREE')")
     public ResponseEntity<WorkspaceDTO> createWorkspace(@PathVariable("user_id") Integer user_id,
-                                                @RequestBody WorkspaceDTO workspaceDTO) throws IdInvalidException{
-        WorkspaceDTO savedWorkspace = workspaceService.createWorkspace(workspaceDTO, user_id);
+                                                @RequestBody WorkspaceCreateDTO workspaceCreateDTO) throws IdInvalidException{
+        WorkspaceDTO savedWorkspace = workspaceService.createWorkspace(workspaceCreateDTO, user_id);
         return new ResponseEntity<>(savedWorkspace, HttpStatus.CREATED);
     }
 
@@ -46,7 +47,7 @@ public class WorkspaceController {
 
     @PutMapping("/{workspace_id}")
     @PreAuthorize("hasRole('FREE')")
-    public ResponseEntity<WorkspaceDTO> updateWorkspace(@RequestBody WorkspaceDTO updatedWorkspace, @PathVariable("workspace_id") Integer workspaceId) throws IdInvalidException{
+    public ResponseEntity<WorkspaceDTO> updateWorkspace(@RequestBody WorkspaceCreateDTO updatedWorkspace, @PathVariable("workspace_id") Integer workspaceId) throws IdInvalidException{
         WorkspaceDTO workspaceDTO = workspaceService.updateWorkspace(updatedWorkspace, workspaceId );
         return ResponseEntity.ok(workspaceDTO);
     }

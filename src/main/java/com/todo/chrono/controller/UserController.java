@@ -6,6 +6,7 @@ import com.todo.chrono.dto.response.ResCreateUserDTO;
 import com.todo.chrono.dto.response.ResUpdateUserDTO;
 import com.todo.chrono.dto.response.ResUserDTO;
 import com.todo.chrono.service.userService.UserService;
+import com.todo.chrono.dto.request.UserCreateDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -31,9 +32,9 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private UserService userService;
     @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') ")
-    public ResponseEntity<ResCreateUserDTO> createUser(@Valid @RequestBody UserDTO userDTO) throws IdInvalidException {
-        UserDTO savedUser = userService.createUser(userDTO);
+    @PreAuthorize("hasAnyRole('ADMIN', 'FREE') ")
+    public ResponseEntity<ResCreateUserDTO> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) throws IdInvalidException {
+        UserDTO savedUser = userService.createUser(userCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(savedUser));
     }
 
@@ -54,9 +55,9 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER') ")
     @PutMapping("/{user_id}")
-    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody UserDTO updatedUser, @PathVariable("user_id") Integer user_id) throws IdInvalidException{
+    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody UserCreateDTO updatedUser, @PathVariable("user_id") Integer user_id) throws IdInvalidException{
         UserDTO userDTO = userService.updateUser(updatedUser,user_id);
         return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(userDTO));
     }
@@ -69,7 +70,7 @@ public class UserController {
 //        return ResponseEntity.ok(null);
 //    }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/delete/{user_id}")
     public ResponseEntity<String> deleteUser(@PathVariable("user_id") Integer user_id) throws IdInvalidException {
         userService.deleteUser(user_id);

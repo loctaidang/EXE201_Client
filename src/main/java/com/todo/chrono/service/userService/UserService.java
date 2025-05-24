@@ -6,17 +6,18 @@ import com.todo.chrono.dto.request.UserDTO;
 import com.todo.chrono.dto.response.ResCreateUserDTO;
 import com.todo.chrono.dto.response.ResUpdateUserDTO;
 import com.todo.chrono.dto.response.ResUserDTO;
+import com.todo.chrono.dto.request.UserCreateDTO;
 
 import java.util.List;
 
 public interface UserService {
-    UserDTO createUser(UserDTO userDTO) throws IdInvalidException;
+    UserDTO createUser(UserCreateDTO userCreateDTO) throws IdInvalidException;
 
     UserDTO getUserById ( Integer user_id) throws IdInvalidException;
 
     List<ResUserDTO> getUserAll();
 
-    UserDTO updateUser(UserDTO updateUser, Integer topic_id);
+    UserDTO updateUser(UserCreateDTO updateUser, Integer user_id);
 
     void deleteUser (Integer user_id) throws IdInvalidException;
 

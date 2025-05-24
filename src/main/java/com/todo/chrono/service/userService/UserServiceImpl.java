@@ -7,8 +7,10 @@ import com.todo.chrono.dto.response.ResCreateUserDTO;
 import com.todo.chrono.dto.response.ResUpdateUserDTO;
 import com.todo.chrono.dto.response.ResUserDTO;
 import com.todo.chrono.entity.User;
+import com.todo.chrono.enums.Role;
 import com.todo.chrono.mapper.UserMapper;
 import com.todo.chrono.repository.UserRepository;
+import com.todo.chrono.dto.request.UserCreateDTO;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,14 +28,14 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) throws IdInvalidException {
-        if (userRepository.existsByUsername(userDTO.getUsername())) {
-            throw new IdInvalidException("Username " + userDTO.getUsername() + " đã tồn tại, vui lòng sử dụng email khác.");
+    public UserDTO createUser(UserCreateDTO userCreateDTO) throws IdInvalidException {
+        if (userRepository.existsByUsername(userCreateDTO.getUsername())) {
+            throw new IdInvalidException("Username " + userCreateDTO.getUsername() + " đã tồn tại, vui lòng sử dụng email khác.");
         }
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        User user = UserMapper.mapToUser(userDTO);
-        user.setRole(userDTO.getRole());
-        user.setImageUrl(userDTO.getImageUrl());
+        userCreateDTO.setPassword(passwordEncoder.encode(userCreateDTO.getPassword()));
+        User user = UserMapper.mapToUser(userCreateDTO);
+        user.setRole(Role.FREE);
+        user.setImageUrl(userCreateDTO.getImageUrl());
         User savedUser= userRepository.save(user);
         return UserMapper.mapToUserDTO(savedUser);
     }
@@ -58,11 +60,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO updateUser(UserDTO updateUser, Integer user_id) {
+    public UserDTO updateUser(UserCreateDTO updateUser, Integer user_id) {
         User user = userRepository.findById(user_id)
                 .orElseThrow(()-> new RuntimeException("User "+user_id+" not found"));
         user.setUsername(updateUser.getUsername());
-        user.setRole(updateUser.getRole());
+        user.setPassword(updateUser.getPassword());
         user.setImageUrl(updateUser.getImageUrl());
         User updateUserObj = userRepository.save(user);
         return UserMapper.mapToUserDTO(updateUserObj);

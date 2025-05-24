@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface TaskRepository extends JpaRepository<Task,Integer> {
     Optional<Task> findById(Integer id);
     boolean existsById(Integer id);
+    int countByWorkspaceId(Integer workspaceId);
+    boolean existsByWorkspaceIdAndTitle(Integer workspaceId, String title);
+    List<Task> findAllByWorkspaceId(Integer workspaceId);
 
     // // Lấy danh sách user đã xóa mềm bằng native query
     // @Query(value = "SELECT * FROM tasks WHERE deleted = true", nativeQuery = true)

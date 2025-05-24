@@ -32,7 +32,7 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private UserService userService;
     @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ADMIN') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FREE') ")
     public ResponseEntity<ResCreateUserDTO> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) throws IdInvalidException {
         UserDTO savedUser = userService.createUser(userCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(savedUser));

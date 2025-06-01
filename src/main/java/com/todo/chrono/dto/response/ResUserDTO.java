@@ -23,6 +23,8 @@ public class ResUserDTO {
 
     private String imageUrl;
 
+    private String name;
+
     private Role role;
 
 }

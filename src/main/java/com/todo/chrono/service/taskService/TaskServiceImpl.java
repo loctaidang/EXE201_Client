@@ -74,10 +74,6 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(task_id)
                 .orElseThrow(() -> new RuntimeException("Task " + task_id + " not found"));
         task.setTitle(updateTask.getTitle());
-        if (taskRepository.existsByWorkspaceIdAndTitle(task.getWorkspace().getId(), updateTask.getTitle())) {
-            throw new IdInvalidException("Task với tên = " + updateTask.getTitle() + " đã tồn tại trong Workspace id = "
-                    + task.getWorkspace().getId());
-        }
         task.setStatus(updateTask.getStatus());
         task.setDueDate(updateTask.getDueDate());
         Task updateTaskObj = taskRepository.save(task);

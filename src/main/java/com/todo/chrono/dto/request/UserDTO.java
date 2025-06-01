@@ -21,7 +21,9 @@ public class UserDTO {
 
     private boolean deleted;
 
-    private LocalDateTime premiumExpiry;     
+    private LocalDateTime premiumExpiry;    
+
+    private String name;
 
     private String imageUrl;
 

@@ -30,6 +30,8 @@ public class User {
     private boolean deleted = false;    
     @Column(name = "premium_expiry")
     private LocalDateTime premiumExpiry;
+    @Column(name = "name")
+    private String name;
     @Column(name = "image_url")
     private String imageUrl;
     @Enumerated(EnumType.STRING)

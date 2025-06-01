@@ -46,6 +46,9 @@ public class AuthService {
         resLoginDTO.setUsername(user.getUsername());
         resLoginDTO.setRole(user.getRole());
         resLoginDTO.setPassword(user.getPassword());
+        resLoginDTO.setPremiumExpiry(user.getPremiumExpiry());
+        resLoginDTO.setName(user.getName());
+        resLoginDTO.setImageUrl(user.getImageUrl());
         return resLoginDTO;
     }
 
@@ -59,7 +62,6 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(Role.FREE); // hoặc Role.USER tùy logic
         user.setDeleted(false);
-        user.setPremiumExpiry(LocalDateTime.now().plusDays(30));
 
         try {
             return userRepository.save(user);

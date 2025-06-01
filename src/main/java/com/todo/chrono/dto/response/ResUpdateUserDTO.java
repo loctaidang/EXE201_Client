@@ -18,5 +18,7 @@ public class ResUpdateUserDTO {
 
     private boolean deleted;
 
+    private String name;
+
     private String imageUrl;
 }

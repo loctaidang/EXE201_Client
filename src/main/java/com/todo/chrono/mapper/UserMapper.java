@@ -16,6 +16,7 @@ public class UserMapper {
         userDTO.setPremiumExpiry(user.getPremiumExpiry());
         userDTO.setImageUrl(user.getImageUrl());
         userDTO.setDeleted(user.isDeleted());
+        userDTO.setName(user.getName());
         return userDTO;
 
     }
@@ -28,12 +29,14 @@ public class UserMapper {
         user.setPremiumExpiry(userDTO.getPremiumExpiry());
         user.setDeleted(userDTO.isDeleted());
         user.setImageUrl(userDTO.getImageUrl());
+        user.setName(userDTO.getName());
         return user;
     }
     public static User mapToUser(UserCreateDTO userCreateDTO){
         User user = new User();
         user.setUsername(userCreateDTO.getUsername());
         user.setPassword(userCreateDTO.getPassword());
+        user.setName(userCreateDTO.getName());
         return user;
     }
 }

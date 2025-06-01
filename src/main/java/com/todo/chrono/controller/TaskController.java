@@ -24,7 +24,7 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping("/workspace/{workspace_id}")
-    @PreAuthorize("hasRole('FREE')")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
     public ResponseEntity<TaskDTO> createTask(@PathVariable("workspace_id") Integer workspace_id,
                                                 @RequestBody TaskCreateDTO taskCreateDTO) throws IdInvalidException{
         TaskDTO savedTask = taskService.createTask(taskCreateDTO, workspace_id);
@@ -32,41 +32,42 @@ public class TaskController {
     }
 
     @GetMapping("/workspace/{workspace_id}")
-    @PreAuthorize("hasRole('FREE')")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
     public ResponseEntity<List<TaskDTO>> getTaskByWorkspaceId (@PathVariable("workspace_id") int workspace_id) throws IdInvalidException {
         List<TaskDTO> taskDTOs = taskService.getTasksByWorkspaceId(workspace_id);
         return ResponseEntity.ok(taskDTOs);
     }
 
     @GetMapping("/{task_id}")
-    @PreAuthorize("hasAnyRole('FREE', 'STUDENT','MANAGER')")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
     public ResponseEntity<TaskDTO> getTaskById (@PathVariable("task_id") Integer task_id) throws IdInvalidException {
         TaskDTO taskDTO = taskService.getTaskById(task_id);
         return ResponseEntity.ok(taskDTO);
     }
 
     @PutMapping("/{task_id}")
-    @PreAuthorize("hasRole('FREE')")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
     public ResponseEntity<TaskDTO> updateTask(@RequestBody TaskCreateDTO updatedTask, @PathVariable("task_id") Integer taskId) throws IdInvalidException{
         TaskDTO taskDTO = taskService.updateTask(updatedTask, taskId );
         return ResponseEntity.ok(taskDTO);
     }
 
     @DeleteMapping("/{task_id}")
-    @PreAuthorize("hasRole('FREE')")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
     public ResponseEntity<Void> deleteTask(@PathVariable("task_id") Integer task_id) throws IdInvalidException {
         TaskDTO currentTask = this.taskService.getTaskById(task_id);
         this.taskService.deleteTask(currentTask.getId());
         return ResponseEntity.ok(null);
     }
     @GetMapping("/{task_id}/workspace")
-    @PreAuthorize("hasAnyRole('FREE', 'STUDENT','MANAGER')")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
     public ResponseEntity<WorkspaceDTO> getWorkspaceIdByTaskId(@PathVariable("task_id") int task_id) throws IdInvalidException {
         WorkspaceDTO workspaceDTO = taskService.getWorkspaceIdByTaskId(task_id);
         return ResponseEntity.ok(workspaceDTO);
     }
 
    @GetMapping
+   @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
    public ResponseEntity<List<TaskDTO>> getTaskAll(){
        List<TaskDTO> task = taskService.getTaskAll();
        return ResponseEntity.ok(task);

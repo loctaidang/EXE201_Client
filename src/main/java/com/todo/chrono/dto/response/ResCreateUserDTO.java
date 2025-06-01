@@ -18,6 +18,8 @@ public class ResCreateUserDTO {
 
     private String imageUrl;
 
+    private String name;
+
     private boolean deleted;
 
 }

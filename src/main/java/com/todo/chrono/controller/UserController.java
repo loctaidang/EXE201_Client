@@ -32,20 +32,20 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private UserService userService;
     @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FREE') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FREE', 'PREMIUM') ")
     public ResponseEntity<ResCreateUserDTO> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) throws IdInvalidException {
         UserDTO savedUser = userService.createUser(userCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(savedUser));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'FREE', 'PREMIUM') ")
     @GetMapping("/get/{user_id}")
     public ResponseEntity<ResUserDTO> getUserById (@PathVariable("user_id") Integer user_id) throws IdInvalidException{
         UserDTO userDTO = userService.getUserById(user_id);
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResUserDTO(userDTO));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'FREE', 'PREMIUM') ")
     @GetMapping("/get/all")
     public ResponseEntity<List<ResUserDTO>> getUserAll(){
         List<ResUserDTO> user = userService.getUserAll();
@@ -55,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'FREE', 'PREMIUM') ")
     @PutMapping("/{user_id}")
     public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody UserCreateDTO updatedUser, @PathVariable("user_id") Integer user_id) throws IdInvalidException{
         UserDTO userDTO = userService.updateUser(updatedUser,user_id);

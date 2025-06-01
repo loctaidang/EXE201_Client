@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
         User user = UserMapper.mapToUser(userCreateDTO);
         user.setRole(Role.FREE);
         user.setImageUrl(userCreateDTO.getImageUrl());
+        user.setName(userCreateDTO.getName());
         User savedUser= userRepository.save(user);
         return UserMapper.mapToUserDTO(savedUser);
     }
@@ -64,8 +65,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(user_id)
                 .orElseThrow(()-> new RuntimeException("User "+user_id+" not found"));
         user.setUsername(updateUser.getUsername());
-        user.setPassword(updateUser.getPassword());
+        user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
         user.setImageUrl(updateUser.getImageUrl());
+        user.setName(updateUser.getName());
         User updateUserObj = userRepository.save(user);
         return UserMapper.mapToUserDTO(updateUserObj);
     }
@@ -98,6 +100,7 @@ public class UserServiceImpl implements UserService {
         res.setDeleted(user.isDeleted());
         res.setPremiumExpiry(user.getPremiumExpiry());
         res.setImageUrl(user.getImageUrl());
+        res.setName(user.getName());
         return res;
     }
     @Override
@@ -109,6 +112,7 @@ public class UserServiceImpl implements UserService {
         res.setDeleted(user.isDeleted());
         res.setPremiumExpiry(user.getPremiumExpiry());
         res.setImageUrl(user.getImageUrl());
+        res.setName(user.getName());
         return res;
     }
     @Override
@@ -120,6 +124,7 @@ public class UserServiceImpl implements UserService {
         res.setDeleted(user.isDeleted());
         res.setPremiumExpiry(user.getPremiumExpiry());
         res.setImageUrl(user.getImageUrl());
+        res.setName(user.getName());
         return res;
     }
 

@@ -122,12 +122,17 @@ public class PaymentService {
         if (queryParams.containsKey("userId")) {
             rechargeRequestDTO.setUserId(Integer.parseInt(queryParams.get("userId")));
         }
-
-        // Lưu thông tin thanh toán
-        savePayment(rechargeRequestDTO);
+        String responseCode = queryParams.get("vnp_ResponseCode");
+        if ("00".equals(responseCode)) {
+            // Thành công
+            savePayment(rechargeRequestDTO, PaymentStatus.PAID);
+        } else {
+            // Thất bại
+            savePayment(rechargeRequestDTO, PaymentStatus.FAILED);
+        }
     }
 
-    public void savePayment(RechargeRequestDTO rechargeRequestDTO) {
+    public void savePayment(RechargeRequestDTO rechargeRequestDTO, PaymentStatus paymentStatus) {
         User user = userRepository.findById(rechargeRequestDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User ID không hợp lệ: " + rechargeRequestDTO.getUserId()));
 
@@ -141,25 +146,27 @@ public class PaymentService {
         }
 
         payment.setPaidAt(LocalDateTime.now());
-        payment.setPaymentStatus(PaymentStatus.PAID);
+        payment.setPaymentStatus(paymentStatus);
         payment.setPayment_method("VNPAY");
         paymentRepository.save(payment);
 
-        if (user.getRole() == Role.PREMIUM) {
-            throw new RuntimeException("Tài khoản đã là PREMIUM, không thể nâng cấp thêm lần nữa.");
+        if (paymentStatus == PaymentStatus.PAID) {
+            if (user.getRole() == Role.PREMIUM) {
+                throw new RuntimeException("Tài khoản đã là PREMIUM, không thể nâng cấp thêm lần nữa.");
+            }
+    
+            user.setRole(Role.PREMIUM);
+    
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime currentExpiry = user.getPremiumExpiry();
+            if (currentExpiry != null && currentExpiry.isAfter(now)) {
+                user.setPremiumExpiry(currentExpiry.plusDays(30));
+            } else {
+                user.setPremiumExpiry(now.plusDays(30));
+            }
+    
+            userRepository.save(user);
         }
-
-        user.setRole(Role.PREMIUM);
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime currentExpiry = user.getPremiumExpiry();
-        if (currentExpiry != null && currentExpiry.isAfter(now)) {
-            user.setPremiumExpiry(currentExpiry.plusDays(30));
-        } else {
-            user.setPremiumExpiry(now.plusDays(30));
-        }
-
-        userRepository.save(user);
     }
     // public List<PaymentDTO> getPaymetsByUserId(int user_id) throws
     // RuntimeException {

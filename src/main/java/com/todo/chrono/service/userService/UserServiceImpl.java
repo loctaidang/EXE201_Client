@@ -1,6 +1,5 @@
 package com.todo.chrono.service.userService;
 
-
 import com.todo.chrono.util.error.IdInvalidException;
 import com.todo.chrono.dto.request.UserDTO;
 import com.todo.chrono.dto.response.ResCreateUserDTO;
@@ -30,14 +29,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserCreateDTO userCreateDTO) throws IdInvalidException {
         if (userRepository.existsByUsername(userCreateDTO.getUsername())) {
-            throw new IdInvalidException("Username " + userCreateDTO.getUsername() + " đã tồn tại, vui lòng sử dụng email khác.");
+            throw new IdInvalidException(
+                    "Username " + userCreateDTO.getUsername() + " đã tồn tại, vui lòng sử dụng email khác.");
         }
         userCreateDTO.setPassword(passwordEncoder.encode(userCreateDTO.getPassword()));
         User user = UserMapper.mapToUser(userCreateDTO);
         user.setRole(Role.FREE);
         user.setImageUrl(userCreateDTO.getImageUrl());
         user.setName(userCreateDTO.getName());
-        User savedUser= userRepository.save(user);
+        User savedUser = userRepository.save(user);
         return UserMapper.mapToUserDTO(savedUser);
     }
 
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(user_id);
         if (user.isPresent()) {
             return UserMapper.mapToUserDTO(user.get());
-        }else{
+        } else {
             throw new IdInvalidException("User với id = " + user_id + " không tồn tại");
         }
     }
@@ -63,11 +63,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(UserCreateDTO updateUser, Integer user_id) {
         User user = userRepository.findById(user_id)
-                .orElseThrow(()-> new RuntimeException("User "+user_id+" not found"));
-        user.setUsername(updateUser.getUsername());
-        user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
-        user.setImageUrl(updateUser.getImageUrl());
-        user.setName(updateUser.getName());
+                .orElseThrow(() -> new RuntimeException("User " + user_id + " not found"));
+        if (updateUser.getUsername() != null && !updateUser.getUsername().isBlank()) {
+            user.setUsername(updateUser.getUsername());
+        }
+
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
+        }
+
+        if (updateUser.getImageUrl() != null) {
+            user.setImageUrl(updateUser.getImageUrl());
+        }
+
+        if (updateUser.getName() != null) {
+            user.setName(updateUser.getName());
+        }
+
         User updateUserObj = userRepository.save(user);
         return UserMapper.mapToUserDTO(updateUserObj);
     }
@@ -75,14 +87,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Integer user_id) throws IdInvalidException {
         User user = userRepository.findById(user_id)
-                .orElseThrow(() -> new IdInvalidException("User với id = " + user_id + " không tồn tại hoặc đã bị xóa"));
+                .orElseThrow(
+                        () -> new IdInvalidException("User với id = " + user_id + " không tồn tại hoặc đã bị xóa"));
         user.setDeleted(true); // Xóa mềm
         userRepository.save(user);
     }
 
     @Override
     public UserDTO handleGetUserByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(()->new RuntimeException("Not exits"+username));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Not exits" + username));
 
         return UserMapper.mapToUserDTO(user);
     }
@@ -103,6 +117,7 @@ public class UserServiceImpl implements UserService {
         res.setName(user.getName());
         return res;
     }
+
     @Override
     public ResUpdateUserDTO convertToResUpdateUserDTO(UserDTO user) {
         ResUpdateUserDTO res = new ResUpdateUserDTO();
@@ -115,6 +130,7 @@ public class UserServiceImpl implements UserService {
         res.setName(user.getName());
         return res;
     }
+
     @Override
     public ResUserDTO convertToResUserDTO(UserDTO user) {
         ResUserDTO res = new ResUserDTO();
@@ -139,7 +155,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restoreUser(Integer userId) throws IdInvalidException {
         User user = userRepository.findByIdAndIsDeletedTrue(userId)
-                .orElseThrow(() -> new IdInvalidException("User với id = " + userId + " không tồn tại hoặc chưa bị xóa mềm"));
+                .orElseThrow(() -> new IdInvalidException(
+                        "User với id = " + userId + " không tồn tại hoặc chưa bị xóa mềm"));
         user.setDeleted(false); // Phục hồi
         userRepository.save(user);
     }

@@ -76,7 +76,7 @@ public class PaymentService {
         vnpParams.put("vnp_TxnRef", userId);
         vnpParams.put("vnp_OrderInfo", "Thanh toan cho ma GD: " + userId);
         vnpParams.put("vnp_OrderType", "other");
-        long vnpAmount = Math.round(amount * 100); 
+        long vnpAmount = Math.round(amount * 100);
         vnpParams.put("vnp_Amount", String.valueOf(vnpAmount));
         vnpParams.put("vnp_ReturnUrl", returnUrl);
         vnpParams.put("vnp_CreateDate", formattedCreateDate);
@@ -148,45 +148,55 @@ public class PaymentService {
     public void savePayment(RechargeRequestDTO rechargeRequestDTO, PaymentStatus paymentStatus) {
         User user = userRepository.findById(rechargeRequestDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User ID không hợp lệ: " + rechargeRequestDTO.getUserId()));
+
         SubscriptionPlans subscriptionPlan = subscriptionPlanRepository
                 .findById(rechargeRequestDTO.getSubscriptionPlanId())
                 .orElseThrow(() -> new RuntimeException(
                         "Subscription plan ID không hợp lệ: " + rechargeRequestDTO.getSubscriptionPlanId()));
-        Payment payment = new Payment();
-        payment.setUser(user);
-        payment.setSubscriptionPlan(subscriptionPlan);
-
-        try {
-            payment.setTotal_money(subscriptionPlan.getPrice());
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Số tiền không hợp lệ: " + subscriptionPlan.getPrice());
-        }
-
-        payment.setPaidAt(LocalDateTime.now());
-        payment.setPaymentStatus(paymentStatus);
-        payment.setPayment_method("VNPAY");
-        paymentRepository.save(payment);
 
         if (paymentStatus == PaymentStatus.PAID) {
             if (user.getRole() == Role.PREMIUM) {
+                Payment payment = new Payment();
+                payment.setUser(user);
+                payment.setSubscriptionPlan(subscriptionPlan);
+                payment.setTotal_money(subscriptionPlan.getPrice());
+                payment.setPaidAt(LocalDateTime.now());
+                payment.setPaymentStatus(PaymentStatus.FAILED); // Hoặc thêm enum STATUS_DUPLICATE
+                payment.setPayment_method("VNPAY");
+                paymentRepository.save(payment);
+
                 throw new RuntimeException("Tài khoản đã là PREMIUM, không thể nâng cấp thêm lần nữa.");
             }
 
             user.setRole(Role.PREMIUM);
-
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime currentExpiry = user.getPremiumExpiry();
             Integer durationDays = subscriptionPlan.getDurationDays();
+
             if (durationDays != null && durationDays == -1) {
+                // Gói vĩnh viễn
                 user.setPremiumExpiry(now.plusYears(100));
             } else if (currentExpiry != null && currentExpiry.isAfter(now)) {
+                // Gia hạn nếu còn hạn
                 user.setPremiumExpiry(currentExpiry.plusDays(durationDays));
             } else {
+                // Gán mới nếu hết hạn
                 user.setPremiumExpiry(now.plusDays(durationDays));
             }
 
             userRepository.save(user);
         }
+
+        // Sau khi tất cả đều hợp lệ mới lưu payment
+        Payment payment = new Payment();
+        payment.setUser(user);
+        payment.setSubscriptionPlan(subscriptionPlan);
+        payment.setTotal_money(subscriptionPlan.getPrice());
+        payment.setPaidAt(LocalDateTime.now());
+        payment.setPaymentStatus(paymentStatus);
+        payment.setPayment_method("VNPAY");
+
+        paymentRepository.save(payment);
     }
     // public List<PaymentDTO> getPaymetsByUserId(int user_id) throws
     // RuntimeException {

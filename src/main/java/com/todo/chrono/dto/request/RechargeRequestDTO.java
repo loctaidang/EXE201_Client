@@ -11,6 +11,6 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RechargeRequestDTO {
-    String amount;
-    int userId;
+    private int userId;
+    private int subscriptionPlanId;
 }

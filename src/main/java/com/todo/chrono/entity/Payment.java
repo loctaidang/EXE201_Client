@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Payment")
+@Table(name = "payment")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +38,7 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    @ManyToOne
+    @JoinColumn(name = "subscription_plan_id", nullable = false)
+    private SubscriptionPlans subscriptionPlan;
 }

@@ -75,14 +75,17 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         String newName = updateWorkspace.getName();
         String currentName = workspace.getName();
 
-        // Chỉ kiểm tra nếu tên mới khác tên hiện tại
-        if (!newName.equals(currentName)
-                && workspaceRepository.existsByUserIdAndName(workspace.getUser().getId(), newName)) {
-            throw new IdInvalidException("Workspace với tên = " + newName + " đã tồn tại trong User id = "
-                    + workspace.getUser().getId());
-        }
+        if (newName != null) {
+            // Nếu tên mới khác tên hiện tại và đã tồn tại tên này trong workspace của user
+            if (!newName.equals(currentName)
+                    && workspaceRepository.existsByUserIdAndName(workspace.getUser().getId(), newName)) {
+                throw new IdInvalidException("Workspace với tên = " + newName + " đã tồn tại trong User id = "
+                        + workspace.getUser().getId());
+            }
 
-        workspace.setName(newName);
+            // Cập nhật tên nếu hợp lệ
+            workspace.setName(newName);
+        }
         workspace.setUpdatedAt(LocalDateTime.now());
         Workspace updateWorkspaceObj = workspaceRepository.save(workspace);
         return WorkspaceMapper.mapToWorkspaceDTO(updateWorkspaceObj);

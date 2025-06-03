@@ -2,6 +2,7 @@ package com.todo.chrono.service;
 
 import com.todo.chrono.dto.request.RechargeRequestDTO;
 import com.todo.chrono.entity.Payment;
+import com.todo.chrono.entity.SubscriptionPlans;
 import com.todo.chrono.entity.User;
 import com.todo.chrono.enums.PaymentStatus;
 import com.todo.chrono.enums.Role;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import com.todo.chrono.repository.UserRepository;
 import com.todo.chrono.repository.PaymentRepository;
+import com.todo.chrono.repository.SubscriptionPlansRepository;
 
 @Service
 @AllArgsConstructor
@@ -29,14 +31,23 @@ public class PaymentService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private SubscriptionPlansRepository subscriptionPlanRepository;
 
     public String createUrl(RechargeRequestDTO rechargeRequestDTO)
             throws NoSuchAlgorithmException, InvalidKeyException, Exception {
 
         User user = userRepository.findById(rechargeRequestDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User ID không hợp lệ: " + rechargeRequestDTO.getUserId()));
+        SubscriptionPlans subscriptionPlan = subscriptionPlanRepository
+                .findById(rechargeRequestDTO.getSubscriptionPlanId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Subscription plan ID không hợp lệ: " + rechargeRequestDTO.getSubscriptionPlanId()));
+        Double amount = subscriptionPlan.getPrice();
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime createDate = LocalDateTime.now();
         String formattedCreateDate = createDate.format(formatter);
@@ -53,7 +64,8 @@ public class PaymentService {
         // String returnUrl = "http://159.223.39.71?student_id=" +
         // rechargeRequestDTO.getStudent_id() + "&course_id=" +
         // rechargeRequestDTO.getCourse_id();
-        String returnUrl = "https://www.exe201.space/" + rechargeRequestDTO.getUserId();
+        String returnUrl = "https://www.exe201.space/" + rechargeRequestDTO.getUserId() + "/"
+                + rechargeRequestDTO.getSubscriptionPlanId();
         String currCode = "VND";
         Map<String, String> vnpParams = new TreeMap<>();
         vnpParams.put("vnp_Version", "2.1.0");
@@ -64,7 +76,8 @@ public class PaymentService {
         vnpParams.put("vnp_TxnRef", userId);
         vnpParams.put("vnp_OrderInfo", "Thanh toan cho ma GD: " + userId);
         vnpParams.put("vnp_OrderType", "other");
-        vnpParams.put("vnp_Amount", rechargeRequestDTO.getAmount() + "00");
+        long vnpAmount = Math.round(amount * 100); 
+        vnpParams.put("vnp_Amount", String.valueOf(vnpAmount));
         vnpParams.put("vnp_ReturnUrl", returnUrl);
         vnpParams.put("vnp_CreateDate", formattedCreateDate);
         vnpParams.put("vnp_IpAddr", "128.199.178.23");
@@ -111,12 +124,12 @@ public class PaymentService {
     }
 
     public void handlePaymentCallback(Map<String, String> queryParams) {
-        if (!queryParams.containsKey("userId") || !queryParams.containsKey("amount")) {
+        if (!queryParams.containsKey("userId") || !queryParams.containsKey("subscriptionPlanId")) {
             throw new IllegalArgumentException("Thiếu thông tin bắt buộc trong callback.");
         }
         RechargeRequestDTO rechargeRequestDTO = new RechargeRequestDTO();
         rechargeRequestDTO.setUserId(Integer.parseInt(queryParams.get("userId")));
-        rechargeRequestDTO.setAmount(queryParams.get("amount"));
+        rechargeRequestDTO.setSubscriptionPlanId(Integer.parseInt(queryParams.get("subscriptionPlanId")));
 
         // Thêm các tham số student_id và course_id nếu có
         if (queryParams.containsKey("userId")) {
@@ -135,14 +148,18 @@ public class PaymentService {
     public void savePayment(RechargeRequestDTO rechargeRequestDTO, PaymentStatus paymentStatus) {
         User user = userRepository.findById(rechargeRequestDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User ID không hợp lệ: " + rechargeRequestDTO.getUserId()));
-
+        SubscriptionPlans subscriptionPlan = subscriptionPlanRepository
+                .findById(rechargeRequestDTO.getSubscriptionPlanId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Subscription plan ID không hợp lệ: " + rechargeRequestDTO.getSubscriptionPlanId()));
         Payment payment = new Payment();
         payment.setUser(user);
+        payment.setSubscriptionPlan(subscriptionPlan);
 
         try {
-            payment.setTotal_money(Integer.parseInt(rechargeRequestDTO.getAmount()));
+            payment.setTotal_money(subscriptionPlan.getPrice());
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Số tiền không hợp lệ: " + rechargeRequestDTO.getAmount());
+            throw new RuntimeException("Số tiền không hợp lệ: " + subscriptionPlan.getPrice());
         }
 
         payment.setPaidAt(LocalDateTime.now());
@@ -154,17 +171,20 @@ public class PaymentService {
             if (user.getRole() == Role.PREMIUM) {
                 throw new RuntimeException("Tài khoản đã là PREMIUM, không thể nâng cấp thêm lần nữa.");
             }
-    
+
             user.setRole(Role.PREMIUM);
-    
+
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime currentExpiry = user.getPremiumExpiry();
-            if (currentExpiry != null && currentExpiry.isAfter(now)) {
-                user.setPremiumExpiry(currentExpiry.plusDays(30));
+            Integer durationDays = subscriptionPlan.getDurationDays();
+            if (durationDays != null && durationDays == -1) {
+                user.setPremiumExpiry(now.plusYears(100));
+            } else if (currentExpiry != null && currentExpiry.isAfter(now)) {
+                user.setPremiumExpiry(currentExpiry.plusDays(durationDays));
             } else {
-                user.setPremiumExpiry(now.plusDays(30));
+                user.setPremiumExpiry(now.plusDays(durationDays));
             }
-    
+
             userRepository.save(user);
         }
     }

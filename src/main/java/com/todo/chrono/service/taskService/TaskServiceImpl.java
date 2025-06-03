@@ -74,8 +74,13 @@ public class TaskServiceImpl implements TaskService {
     public TaskDTO updateTask(TaskCreateDTO updateTask, Integer task_id) throws IdInvalidException {
         Task task = taskRepository.findById(task_id)
                 .orElseThrow(() -> new RuntimeException("Task " + task_id + " not found"));
-        if (updateTask.getTitle() != null && !updateTask.getTitle().isBlank()) {
-            task.setTitle(updateTask.getTitle());
+        String newName = updateTask.getTitle();
+        String currentName = task.getTitle();
+
+        if (newName != null && !newName.equals(currentName)
+                && taskRepository.existsByWorkspaceIdAndTitle(task.getWorkspace().getId(), newName)) {
+            throw new IdInvalidException("Task với tên = " + newName + " đã tồn tại trong Workspace id = "
+                    + task.getWorkspace().getId());
         }
         if (updateTask.getStatus() != null) {
             task.setStatus(updateTask.getStatus());
@@ -125,10 +130,11 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskDTO> getTasksByWorkspaceIdAndStatus(int workspace_id, TaskStatus status) throws IdInvalidException {
         List<Task> tasks = taskRepository.findAllByWorkspaceIdAndStatus(workspace_id, status);
         if (tasks.isEmpty()) {
-            throw new IdInvalidException("Không có task nào với trạng thái: " + status + " trong Workspace id = " + workspace_id);
+            throw new IdInvalidException(
+                    "Không có task nào với trạng thái: " + status + " trong Workspace id = " + workspace_id);
         }
         return tasks.stream()
-                    .map(TaskMapper::mapToTaskDTO)
-                    .collect(Collectors.toList());
+                .map(TaskMapper::mapToTaskDTO)
+                .collect(Collectors.toList());
     }
 }

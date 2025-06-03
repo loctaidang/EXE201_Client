@@ -12,6 +12,7 @@ import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.service.taskService.TaskService;
 import com.todo.chrono.dto.request.TaskDTO;
 import com.todo.chrono.dto.request.TaskCreateDTO;
+import com.todo.chrono.enums.TaskStatus;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -70,6 +71,13 @@ public class TaskController {
    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
    public ResponseEntity<List<TaskDTO>> getTaskAll(){
        List<TaskDTO> task = taskService.getTaskAll();
+       return ResponseEntity.ok(task);
+   }
+
+   @GetMapping("/workspace/{workspace_id}/status/{status}")
+   @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
+   public ResponseEntity<List<TaskDTO>> getTasksByWorkspaceIdAndStatus(@PathVariable("workspace_id") int workspace_id, @PathVariable("status") TaskStatus status) throws IdInvalidException {
+       List<TaskDTO> task = taskService.getTasksByWorkspaceIdAndStatus(workspace_id, status);
        return ResponseEntity.ok(task);
    }
 

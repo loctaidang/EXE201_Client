@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
-
+import com.todo.chrono.enums.TaskStatus;
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class TaskCreateDTO {
 
     private String title;
-    private String status;
+    private TaskStatus status;
     private LocalDateTime dueDate;
     
 }

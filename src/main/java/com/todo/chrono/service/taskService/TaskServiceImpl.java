@@ -16,6 +16,7 @@ import com.todo.chrono.mapper.WorkspaceMapper;
 import com.todo.chrono.repository.UserRepository;
 import com.todo.chrono.mapper.UserMapper;
 import java.time.LocalDateTime;
+import com.todo.chrono.enums.TaskStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,9 +74,15 @@ public class TaskServiceImpl implements TaskService {
     public TaskDTO updateTask(TaskCreateDTO updateTask, Integer task_id) throws IdInvalidException {
         Task task = taskRepository.findById(task_id)
                 .orElseThrow(() -> new RuntimeException("Task " + task_id + " not found"));
-        task.setTitle(updateTask.getTitle());
-        task.setStatus(updateTask.getStatus());
-        task.setDueDate(updateTask.getDueDate());
+        if (updateTask.getTitle() != null && !updateTask.getTitle().isBlank()) {
+            task.setTitle(updateTask.getTitle());
+        }
+        if (updateTask.getStatus() != null) {
+            task.setStatus(updateTask.getStatus());
+        }
+        if (updateTask.getDueDate() != null) {
+            task.setDueDate(updateTask.getDueDate());
+        }
         Task updateTaskObj = taskRepository.save(task);
         return TaskMapper.mapToTaskDTO(updateTaskObj);
     }
@@ -112,5 +119,16 @@ public class TaskServiceImpl implements TaskService {
         List<Task> tasks = taskRepository.findAll();
         return tasks.stream().map(
                 (task) -> TaskMapper.mapToTaskDTO(task)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TaskDTO> getTasksByWorkspaceIdAndStatus(int workspace_id, TaskStatus status) throws IdInvalidException {
+        List<Task> tasks = taskRepository.findAllByWorkspaceIdAndStatus(workspace_id, status);
+        if (tasks.isEmpty()) {
+            throw new IdInvalidException("Không có task nào với trạng thái: " + status + " trong Workspace id = " + workspace_id);
+        }
+        return tasks.stream()
+                    .map(TaskMapper::mapToTaskDTO)
+                    .collect(Collectors.toList());
     }
 }

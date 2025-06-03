@@ -5,6 +5,7 @@ import com.todo.chrono.util.error.IdInvalidException;
 import com.todo.chrono.dto.request.TaskDTO;
 import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.dto.request.TaskCreateDTO;
+import com.todo.chrono.enums.TaskStatus;
 
 import java.util.List;
 
@@ -22,4 +23,5 @@ public interface TaskService {
 
     List<TaskDTO> getTaskAll();
     WorkspaceDTO getWorkspaceIdByTaskId(int task_id) throws IdInvalidException;
+    List<TaskDTO> getTasksByWorkspaceIdAndStatus(int workspace_id, TaskStatus status) throws IdInvalidException;
 }

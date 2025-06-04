@@ -64,8 +64,10 @@ public class PaymentService {
         // String returnUrl = "http://159.223.39.71?student_id=" +
         // rechargeRequestDTO.getStudent_id() + "&course_id=" +
         // rechargeRequestDTO.getCourse_id();
-        String returnUrl = "https://www.exe201.space/" + rechargeRequestDTO.getUserId() + "/"
-                + rechargeRequestDTO.getSubscriptionPlanId();
+        String returnUrl = "https://www.exe201.space/home/PageProListPage"
+                + "?userId=" + rechargeRequestDTO.getUserId()
+                + "&subscriptionPlanId=" + rechargeRequestDTO.getSubscriptionPlanId();
+
         String currCode = "VND";
         Map<String, String> vnpParams = new TreeMap<>();
         vnpParams.put("vnp_Version", "2.1.0");

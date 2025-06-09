@@ -14,6 +14,10 @@ import com.todo.chrono.repository.UserRepository;
 import com.todo.chrono.mapper.UserMapper;
 import java.time.LocalDateTime;
 import com.todo.chrono.dto.request.WorkspaceCreateDTO;
+import com.todo.chrono.repository.WorkspaceMemberRepository;
+import com.todo.chrono.entity.WorkspaceMember;
+import com.todo.chrono.enums.RoleWorkspaceMember;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private WorkspaceRepository workspaceRepository;
     private UserRepository userRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
 
     @Override
     public WorkspaceDTO createWorkspace(WorkspaceCreateDTO workspaceCreateDTO, Integer user_id)
@@ -52,6 +57,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         workspace.setUpdatedAt(LocalDateTime.now());
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
+        WorkspaceMember member = new WorkspaceMember();
+        member.setWorkspace(savedWorkspace);
+        member.setUser(user);
+        member.setRole(RoleWorkspaceMember.OWNER);
+        member.setJoinedAt(LocalDateTime.now());
+        workspaceMemberRepository.save(member);
         return WorkspaceMapper.mapToWorkspaceDTO(savedWorkspace);
     }
 

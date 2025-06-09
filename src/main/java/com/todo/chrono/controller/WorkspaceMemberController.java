@@ -1,5 +1,6 @@
 package com.todo.chrono.controller;
 
+import com.todo.chrono.dto.request.AddMemberRequest;
 import com.todo.chrono.dto.request.RoleRequest;
 import com.todo.chrono.dto.request.WorkspaceMemberDTO;
 import com.todo.chrono.service.workspaceMemberService.WorkspaceMemberService;
@@ -28,9 +29,9 @@ public class WorkspaceMemberController {
     @PreAuthorize("hasAnyRole('ADMIN', 'FREE', 'PREMIUM')")
     public ResponseEntity<WorkspaceMemberDTO> addMemberToWorkspace(
             @PathVariable Integer workspaceId,
-            @PathVariable Integer userId) throws IdInvalidException {
+            @RequestBody AddMemberRequest request ) throws IdInvalidException {
         WorkspaceMemberDTO addedMember = workspaceMemberService.addMemberToWorkspace(
-                workspaceId, userId);
+                workspaceId, request.getUserId());
         return ResponseEntity.ok(addedMember);
     }
 
@@ -47,11 +48,10 @@ public class WorkspaceMemberController {
     public ResponseEntity<WorkspaceMemberDTO> updateMemberRole(
             @PathVariable Integer workspaceId,
             @PathVariable Integer userId,
-            @RequestParam Integer currentUserId,
             @RequestParam RoleWorkspaceMember newRole) throws IdInvalidException {
 
         WorkspaceMemberDTO updatedMember = workspaceMemberService
-                .updateMemberRole(workspaceId, userId, currentUserId, newRole);
+                .updateMemberRole(workspaceId, userId, newRole);
 
         return ResponseEntity.ok(updatedMember);
     }
@@ -60,10 +60,9 @@ public class WorkspaceMemberController {
     @PreAuthorize("hasAnyRole('ADMIN', 'FREE', 'PREMIUM')")
     public ResponseEntity<?> removeMemberFromWorkspace(
             @PathVariable Integer workspaceId,
-            @PathVariable Integer userId,
-            @RequestParam Integer currentUserId) throws IdInvalidException {
+            @PathVariable Integer userId) throws IdInvalidException {
 
-        workspaceMemberService.removeMemberFromWorkspace(workspaceId, userId, currentUserId);
+        workspaceMemberService.removeMemberFromWorkspace(workspaceId, userId);
         return ResponseEntity.ok("Xóa thành viên khỏi workspace thành công.");
     }
 

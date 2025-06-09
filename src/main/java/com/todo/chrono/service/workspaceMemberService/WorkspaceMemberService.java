@@ -15,10 +15,9 @@ public interface WorkspaceMemberService {
         WorkspaceMemberDTO updateMemberRole(
                         Integer workspaceId,
                         Integer targetUserId,
-                        Integer currentUserId,
                         RoleWorkspaceMember newRole) throws IdInvalidException;
 
-        public void removeMemberFromWorkspace(Integer workspaceId, Integer targetUserId, Integer currentUserId)
+        public void removeMemberFromWorkspace(Integer workspaceId, Integer targetUserId)
                         throws IdInvalidException;
 
         public void leaveWorkspace(Integer workspaceId, Integer userId) throws IdInvalidException;

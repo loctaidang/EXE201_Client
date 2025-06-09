@@ -24,31 +24,33 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     private final WorkspaceRepository workspaceRepository;
     private final UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final com.todo.chrono.util.AccountUtil accountUtil;
 
     @Override
     public WorkspaceMemberDTO addMemberToWorkspace(Integer workspaceId, Integer userId)
-        throws IdInvalidException {
+            throws IdInvalidException {
 
-    Workspace workspace = workspaceRepository.findById(workspaceId)
-            .orElseThrow(() -> new IdInvalidException("Workspace ID không hợp lệ"));
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new IdInvalidException("Workspace ID không hợp lệ"));
 
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IdInvalidException("User ID không hợp lệ"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IdInvalidException("User ID không hợp lệ"));
 
-    boolean exists = workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, userId);
-    if (exists) {
-        throw new IdInvalidException("User đã là thành viên của workspace");
+        boolean exists = workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, userId);
+        if (exists) {
+            throw new IdInvalidException("User đã là thành viên của workspace");
+        }
+
+        WorkspaceMember member = new WorkspaceMember();
+        member.setWorkspace(workspace);
+        member.setUser(user);
+        member.setRole(RoleWorkspaceMember.MEMBER); // ✅ Mặc định là MEMBER
+        member.setJoinedAt(java.time.LocalDateTime.now());
+
+        WorkspaceMember saved = workspaceMemberRepository.save(member);
+        return WorkspaceMemberMapper.mapToWorkspaceMemberDTO(saved);
     }
 
-    WorkspaceMember member = new WorkspaceMember();
-    member.setWorkspace(workspace);
-    member.setUser(user);
-    member.setRole(RoleWorkspaceMember.MEMBER);  // ✅ Mặc định là MEMBER
-    member.setJoinedAt(java.time.LocalDateTime.now());
-
-    WorkspaceMember saved = workspaceMemberRepository.save(member);
-    return WorkspaceMemberMapper.mapToWorkspaceMemberDTO(saved);
-}
     @Override
     public List<WorkspaceMemberDTO> getMembersByWorkspaceId(Integer workspaceId) {
         List<WorkspaceMember> members = workspaceMemberRepository.findByWorkspaceId(workspaceId);
@@ -58,13 +60,12 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     }
 
     @Override
-    public WorkspaceMemberDTO updateMemberRole(
-            Integer workspaceId,
-            Integer targetUserId,
-            Integer currentUserId,
-            RoleWorkspaceMember newRole) throws IdInvalidException {
+    public WorkspaceMemberDTO updateMemberRole(Integer workspaceId, Integer targetUserId, RoleWorkspaceMember newRole)
+            throws IdInvalidException {
 
-        // Kiểm tra người thực hiện có phải OWNER không
+                User currentUser = accountUtil.getCurrentUser();
+                Integer currentUserId = currentUser.getId();
+
         WorkspaceMember currentUserMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, currentUserId)
                 .orElseThrow(() -> new IdInvalidException("Người dùng không phải thành viên workspace"));
@@ -73,12 +74,10 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
             throw new IdInvalidException("Chỉ OWNER mới có quyền thay đổi vai trò thành viên.");
         }
 
-        // Không cho phép gán quyền OWNER cho người khác
         if (newRole == RoleWorkspaceMember.OWNER) {
             throw new IdInvalidException("Không thể gán quyền OWNER cho thành viên khác.");
         }
 
-        // Tìm người cần cập nhật
         WorkspaceMember targetMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, targetUserId)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy thành viên cần cập nhật"));
@@ -90,9 +89,12 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     }
 
     @Override
-    public void removeMemberFromWorkspace(Integer workspaceId, Integer targetUserId, Integer currentUserId)
+    public void removeMemberFromWorkspace(Integer workspaceId, Integer targetUserId)
             throws IdInvalidException {
-        // Kiểm tra quyền người thực hiện (currentUserId)
+
+        User currentUser = accountUtil.getCurrentUser();
+        Integer currentUserId = currentUser.getId();
+
         WorkspaceMember currentUserMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, currentUserId)
                 .orElseThrow(
@@ -102,12 +104,10 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
             throw new IdInvalidException("Chỉ OWNER mới có quyền xóa thành viên.");
         }
 
-        // Không cho phép xóa chính mình (nếu cần)
         if (currentUserId.equals(targetUserId)) {
             throw new IdInvalidException("OWNER không thể tự xóa chính mình khỏi workspace.");
         }
 
-        // Tìm thành viên cần xóa
         WorkspaceMember targetMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, targetUserId)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy thành viên cần xóa."));

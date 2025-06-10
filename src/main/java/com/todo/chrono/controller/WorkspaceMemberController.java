@@ -25,7 +25,7 @@ public class WorkspaceMemberController {
 
     private final WorkspaceMemberService workspaceMemberService;
 
-    @PostMapping("/{workspaceId}/members/{userId}")
+    @PostMapping("/{workspaceId}/members")
     @PreAuthorize("hasAnyRole('ADMIN', 'FREE', 'PREMIUM')")
     public ResponseEntity<WorkspaceMemberDTO> addMemberToWorkspace(
             @PathVariable Integer workspaceId,

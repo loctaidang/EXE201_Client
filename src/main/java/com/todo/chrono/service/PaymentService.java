@@ -241,21 +241,13 @@ public class PaymentService {
     }
 
     public List<PaymentHistoryDTO> getPaymentHistoryByUserId(Integer userId) throws IdInvalidException {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy người dùng với ID = " + userId));
     
-        List<Payment> payments = paymentRepository.findByUserIdOrderByPaidAtDesc(userId);
-    
-        return payments.stream().map(payment -> {
-            PaymentHistoryDTO dto = new PaymentHistoryDTO();
-            dto.setPaymentId(payment.getId());
-            dto.setSubscriptionPlanName(payment.getSubscriptionPlan().getName());
-            dto.setTotalMoney(payment.getTotalMoney());
-            dto.setPaymentMethod(payment.getPaymentMethod());
-            dto.setPaymentStatus(payment.getPaymentStatus());
-            dto.setPaidAt(payment.getPaidAt());
-            return dto;
-        }).collect(Collectors.toList());
+        return paymentRepository.findByUserIdOrderByPaidAtDesc(userId)
+                .stream()
+                .map(PaymentMapper::mapToPaymentHistoryDTO)
+                .collect(Collectors.toList());
     }
 
     

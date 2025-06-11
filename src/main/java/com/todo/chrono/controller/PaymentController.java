@@ -80,9 +80,9 @@ public class PaymentController {
         return ResponseEntity.ok(revenue);
     }
 
-    @GetMapping("/revenue/subscription/day")
+    @GetMapping("/revenue/{subscription_plans_id}/day")
     public ResponseEntity<BigDecimal> getRevenueByDay(
-            @RequestParam int subscriptionPlanId,
+            @PathVariable int subscriptionPlanId,
             @RequestParam int year,
             @RequestParam int month,
             @RequestParam int day) {
@@ -90,17 +90,17 @@ public class PaymentController {
                 .ok(paymentService.getRevenueBySubscriptionPlanAndDay(subscriptionPlanId, year, month, day));
     }
 
-    @GetMapping("/revenue/subscription/month")
+    @GetMapping("/revenue/{subscription_plans_id}/month")
     public ResponseEntity<BigDecimal> getRevenueByMonth(
-            @RequestParam int subscriptionPlanId,
+            @PathVariable int subscriptionPlanId,
             @RequestParam int year,
             @RequestParam int month) {
         return ResponseEntity.ok(paymentService.getRevenueBySubscriptionPlanAndMonth(subscriptionPlanId, year, month));
     }
 
-    @GetMapping("/revenue/subscription/year")
+    @GetMapping("/revenue/{subscription_plans_id}/year")
     public ResponseEntity<BigDecimal> getRevenueByYear(
-            @RequestParam int subscriptionPlanId,
+            @PathVariable int subscriptionPlanId,
             @RequestParam int year) {
         return ResponseEntity.ok(paymentService.getRevenueBySubscriptionPlanAndYear(subscriptionPlanId, year));
     }

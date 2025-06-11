@@ -94,7 +94,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
 
         User currentUser = accountUtil.getCurrentUser();
         Integer currentUserId = currentUser.getId();
-
+                
         WorkspaceMember currentUserMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, currentUserId)
                 .orElseThrow(

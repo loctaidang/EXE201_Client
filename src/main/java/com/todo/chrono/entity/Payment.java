@@ -26,10 +26,10 @@ public class Payment {
     private PaymentStatus paymentStatus;
 
     @Column(name = "payment_method")
-    private String payment_method;
+    private String paymentMethod;
 
     @Column(name = "total_money")
-    private double total_money;
+    private double totalMoney;
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;

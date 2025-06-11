@@ -67,6 +67,7 @@ public class WorkspaceMemberController {
     }
 
     @DeleteMapping("/{workspaceId}/leave")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FREE', 'PREMIUM')")
     public ResponseEntity<?> leaveWorkspace(
             @PathVariable Integer workspaceId,
             @RequestParam Integer userId) throws IdInvalidException {

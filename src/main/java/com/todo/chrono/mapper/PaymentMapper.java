@@ -45,4 +45,14 @@ public class PaymentMapper {
 
         return payment;
     }
+    public static PaymentHistoryDTO mapToPaymentHistoryDTO(Payment payment) {
+        PaymentHistoryDTO dto = new PaymentHistoryDTO();
+        dto.setPaymentId(payment.getId());
+        dto.setSubscriptionPlanName(payment.getSubscriptionPlan().getName());
+        dto.setTotalMoney(payment.getTotalMoney());
+        dto.setPaymentMethod(payment.getPaymentMethod());
+        dto.setPaymentStatus(payment.getPaymentStatus());
+        dto.setPaidAt(payment.getPaidAt());
+        return dto;
+    }
 }

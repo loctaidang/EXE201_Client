@@ -1,18 +1,27 @@
 package com.todo.chrono.service;
 
+import com.todo.chrono.dto.request.PaymentHistoryDTO;
 import com.todo.chrono.dto.request.RechargeRequestDTO;
 import com.todo.chrono.entity.Payment;
 import com.todo.chrono.entity.SubscriptionPlans;
 import com.todo.chrono.entity.User;
 import com.todo.chrono.enums.PaymentStatus;
 import com.todo.chrono.enums.Role;
+import com.todo.chrono.mapper.PaymentMapper;
+import com.todo.chrono.repository.PaymentRepository;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import com.todo.chrono.repository.UserRepository;
+import com.todo.chrono.util.error.IdInvalidException;
 import com.todo.chrono.repository.PaymentRepository;
 import com.todo.chrono.repository.SubscriptionPlansRepository;
 
@@ -161,10 +171,10 @@ public class PaymentService {
                 Payment payment = new Payment();
                 payment.setUser(user);
                 payment.setSubscriptionPlan(subscriptionPlan);
-                payment.setTotal_money(subscriptionPlan.getPrice());
+                payment.setTotalMoney(subscriptionPlan.getPrice());
                 payment.setPaidAt(LocalDateTime.now());
                 payment.setPaymentStatus(PaymentStatus.FAILED); // Hoặc thêm enum STATUS_DUPLICATE
-                payment.setPayment_method("VNPAY");
+                payment.setPaymentMethod("VNPAY");
                 paymentRepository.save(payment);
 
                 throw new RuntimeException("Tài khoản đã là PREMIUM, không thể nâng cấp thêm lần nữa.");
@@ -193,13 +203,63 @@ public class PaymentService {
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setSubscriptionPlan(subscriptionPlan);
-        payment.setTotal_money(subscriptionPlan.getPrice());
+        payment.setTotalMoney(subscriptionPlan.getPrice());
         payment.setPaidAt(LocalDateTime.now());
         payment.setPaymentStatus(paymentStatus);
-        payment.setPayment_method("VNPAY");
+        payment.setPaymentMethod("VNPAY");
 
         paymentRepository.save(payment);
     }
+    public BigDecimal getRevenueByDay(int year, int month, int day) {
+        return paymentRepository.getTotalRevenueByDay(year, month, day);
+    }
+
+    public BigDecimal getRevenueByMonth(int year, int month) {
+        return paymentRepository.getTotalRevenueByMonth(year, month);
+    }
+
+    public BigDecimal getRevenueByYear(int year) {
+        return paymentRepository.getTotalRevenueByYear(year);
+    }
+
+    public BigDecimal getRevenueBetweenDates(LocalDate startDate, LocalDate endDate) {
+        return paymentRepository.getTotalRevenueBetweenDates(startDate, endDate);
+    }
+    public BigDecimal getRevenueBySubscriptionPlan(int subscriptionPlanId, LocalDate  start, LocalDate end) {
+        return paymentRepository.getRevenueBySubscriptionPlanAndDateRange(subscriptionPlanId, start, end);
+    }
+    public BigDecimal getRevenueBySubscriptionPlanAndDay(int subscriptionPlanId, int year, int month, int day) {
+        return paymentRepository.getRevenueBySubscriptionPlanAndDay(subscriptionPlanId, year, month, day);
+    }
+
+    public BigDecimal getRevenueBySubscriptionPlanAndMonth(int subscriptionPlanId, int year, int month) {
+        return paymentRepository.getRevenueBySubscriptionPlanAndMonth(subscriptionPlanId, year, month);
+    }
+
+    public BigDecimal getRevenueBySubscriptionPlanAndYear(int subscriptionPlanId, int year) {
+        return paymentRepository.getRevenueBySubscriptionPlanAndYear(subscriptionPlanId, year);
+    }
+
+    public List<PaymentHistoryDTO> getPaymentHistoryByUserId(Integer userId) throws IdInvalidException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy người dùng với ID = " + userId));
+    
+        List<Payment> payments = paymentRepository.findByUserIdOrderByPaidAtDesc(userId);
+    
+        return payments.stream().map(payment -> {
+            PaymentHistoryDTO dto = new PaymentHistoryDTO();
+            dto.setPaymentId(payment.getId());
+            dto.setSubscriptionPlanName(payment.getSubscriptionPlan().getName());
+            dto.setTotalMoney(payment.getTotalMoney());
+            dto.setPaymentMethod(payment.getPaymentMethod());
+            dto.setPaymentStatus(payment.getPaymentStatus());
+            dto.setPaidAt(payment.getPaidAt());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    
+
     // public List<PaymentDTO> getPaymetsByUserId(int user_id) throws
     // RuntimeException {
     // User user = userRepository.findById(user_id)

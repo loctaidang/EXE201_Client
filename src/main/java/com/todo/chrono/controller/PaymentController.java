@@ -73,7 +73,7 @@ public class PaymentController {
 
     @GetMapping("/revenue/{subscription_plans_id}")
     public ResponseEntity<BigDecimal> getRevenueBySubscriptionPlan(
-            @PathVariable int subscriptionPlanId,
+            @PathVariable ("subscription_plans_id") int subscriptionPlanId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate end) {
         BigDecimal revenue = paymentService.getRevenueBySubscriptionPlan(subscriptionPlanId, start, end);
@@ -82,7 +82,7 @@ public class PaymentController {
 
     @GetMapping("/revenue/{subscription_plans_id}/day")
     public ResponseEntity<BigDecimal> getRevenueByDay(
-            @PathVariable int subscriptionPlanId,
+            @PathVariable ("subscription_plans_id") int subscriptionPlanId,
             @RequestParam int year,
             @RequestParam int month,
             @RequestParam int day) {
@@ -92,7 +92,7 @@ public class PaymentController {
 
     @GetMapping("/revenue/{subscription_plans_id}/month")
     public ResponseEntity<BigDecimal> getRevenueByMonth(
-            @PathVariable int subscriptionPlanId,
+            @PathVariable ("subscription_plans_id") int subscriptionPlanId,
             @RequestParam int year,
             @RequestParam int month) {
         return ResponseEntity.ok(paymentService.getRevenueBySubscriptionPlanAndMonth(subscriptionPlanId, year, month));
@@ -100,7 +100,7 @@ public class PaymentController {
 
     @GetMapping("/revenue/{subscription_plans_id}/year")
     public ResponseEntity<BigDecimal> getRevenueByYear(
-            @PathVariable int subscriptionPlanId,
+            @PathVariable ("subscription_plans_id") int subscriptionPlanId,
             @RequestParam int year) {
         return ResponseEntity.ok(paymentService.getRevenueBySubscriptionPlanAndYear(subscriptionPlanId, year));
     }

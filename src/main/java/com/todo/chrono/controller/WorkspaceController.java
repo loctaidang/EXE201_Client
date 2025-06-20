@@ -72,5 +72,13 @@ public class WorkspaceController {
        List<WorkspaceDTO> workspace = workspaceService.getWorkspaceAll();
        return ResponseEntity.ok(workspace);
    }
-
+   @GetMapping("/{workspaceId}/progress")
+   public ResponseEntity<Integer> getWorkspaceProgress(@PathVariable int workspaceId) {
+       try {
+           int progress = workspaceService.getWorkspaceProgress(workspaceId);
+           return ResponseEntity.ok(progress);
+       } catch (IdInvalidException e) {
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+       }
+   }
 }

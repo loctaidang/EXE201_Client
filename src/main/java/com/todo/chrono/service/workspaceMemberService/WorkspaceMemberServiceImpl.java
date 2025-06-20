@@ -5,6 +5,7 @@ import com.todo.chrono.entity.User;
 import com.todo.chrono.entity.Workspace;
 import com.todo.chrono.entity.WorkspaceMember;
 import com.todo.chrono.mapper.WorkspaceMemberMapper;
+import com.todo.chrono.repository.TaskRepository;
 import com.todo.chrono.repository.UserRepository;
 import com.todo.chrono.repository.WorkspaceMemberRepository;
 import com.todo.chrono.repository.WorkspaceRepository;
@@ -12,6 +13,7 @@ import com.todo.chrono.util.error.IdInvalidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.todo.chrono.enums.RoleWorkspaceMember;
+import com.todo.chrono.enums.TaskStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     private final UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final com.todo.chrono.util.AccountUtil accountUtil;
+    private final TaskRepository taskRepository;
 
     @Override
     public WorkspaceMemberDTO addMemberToWorkspace(Integer workspaceId, Integer userId)
@@ -63,8 +66,8 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     public WorkspaceMemberDTO updateMemberRole(Integer workspaceId, Integer targetUserId, RoleWorkspaceMember newRole)
             throws IdInvalidException {
 
-                User currentUser = accountUtil.getCurrentUser();
-                Integer currentUserId = currentUser.getId();
+        User currentUser = accountUtil.getCurrentUser();
+        Integer currentUserId = currentUser.getId();
 
         WorkspaceMember currentUserMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, currentUserId)
@@ -94,7 +97,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
 
         User currentUser = accountUtil.getCurrentUser();
         Integer currentUserId = currentUser.getId();
-                
+
         WorkspaceMember currentUserMember = workspaceMemberRepository
                 .findByWorkspaceIdAndUserId(workspaceId, currentUserId)
                 .orElseThrow(
@@ -128,5 +131,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
 
         workspaceMemberRepository.delete(member);
     }
+
+   
 
 }

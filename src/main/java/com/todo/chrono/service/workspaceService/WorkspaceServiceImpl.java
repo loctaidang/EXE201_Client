@@ -17,6 +17,8 @@ import com.todo.chrono.dto.request.WorkspaceCreateDTO;
 import com.todo.chrono.repository.WorkspaceMemberRepository;
 import com.todo.chrono.entity.WorkspaceMember;
 import com.todo.chrono.enums.RoleWorkspaceMember;
+import com.todo.chrono.repository.TaskRepository;
+import com.todo.chrono.enums.TaskStatus;
 
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private WorkspaceRepository workspaceRepository;
     private UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public WorkspaceDTO createWorkspace(WorkspaceCreateDTO workspaceCreateDTO, Integer user_id)
@@ -130,5 +133,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         List<Workspace> workspaces = workspaceRepository.findAll();
         return workspaces.stream().map(
                 (workspace) -> WorkspaceMapper.mapToWorkspaceDTO(workspace)).collect(Collectors.toList());
+    }
+    @Override
+    public int getWorkspaceProgress(int workspaceId) throws IdInvalidException {
+        if (!workspaceRepository.existsById(workspaceId)) {
+            throw new IdInvalidException("Workspace id = " + workspaceId + " không tồn tại");
+        }
+
+        int totalTasks = taskRepository.countByWorkspaceId(workspaceId);
+        if (totalTasks == 0)
+            return 0;
+
+        int completedTasks = taskRepository.countByWorkspaceIdAndStatus(workspaceId, TaskStatus.COMPLETED);
+        return (int) ((double) completedTasks / totalTasks * 100);
     }
 }

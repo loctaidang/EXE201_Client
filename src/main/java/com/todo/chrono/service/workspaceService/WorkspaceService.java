@@ -21,4 +21,5 @@ public interface WorkspaceService {
 
     List<WorkspaceDTO> getWorkspaceAll();
     UserDTO getUserIdByWorkspaceId(int workspace_id);
+    public int getWorkspaceProgress(int workspaceId) throws IdInvalidException;
 }

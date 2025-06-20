@@ -20,7 +20,7 @@ public interface TaskRepository extends JpaRepository<Task,Integer> {
     boolean existsByWorkspaceIdAndTitle(Integer workspaceId, String title);
     List<Task> findAllByWorkspaceId(Integer workspaceId);
     List<Task> findAllByWorkspaceIdAndStatus(Integer workspaceId, TaskStatus status);
-    
+    int countByWorkspaceIdAndStatus(int workspaceId, TaskStatus status);
     // // Lấy danh sách user đã xóa mềm bằng native query
     // @Query(value = "SELECT * FROM tasks WHERE deleted = true", nativeQuery = true)
     // List<Task> findAllByIsDeletedTrue();

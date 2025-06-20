@@ -74,4 +74,5 @@ public class WorkspaceMemberController {
         workspaceMemberService.leaveWorkspace(workspaceId, userId);
         return ResponseEntity.ok("Rời khỏi workspace thành công.");
     }
+    
 }

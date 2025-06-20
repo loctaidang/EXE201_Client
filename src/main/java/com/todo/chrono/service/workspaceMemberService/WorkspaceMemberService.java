@@ -21,5 +21,7 @@ public interface WorkspaceMemberService {
                         throws IdInvalidException;
 
         public void leaveWorkspace(Integer workspaceId, Integer userId) throws IdInvalidException;
+        
+
 
 }

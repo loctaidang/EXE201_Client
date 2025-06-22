@@ -78,7 +78,7 @@ public class WorkspaceController {
         return ResponseEntity.ok(workspace);
     }
 
-    @GetMapping("/{workspaceId}/progress")
+    @GetMapping("/progress/workspace/{workspaceId}")
     public ResponseEntity<Integer> getWorkspaceProgress(@PathVariable int workspaceId) {
         try {
             int progress = workspaceService.getWorkspaceProgress(workspaceId);
@@ -88,7 +88,7 @@ public class WorkspaceController {
         }
     }
 
-    @GetMapping("/{userId}/progress")
+    @GetMapping("/progress/user/{userId}")
     public ResponseEntity<List<WorkspaceDTO>> getInProgressWorkspaces(@PathVariable int userId) {
         try {
             List<WorkspaceDTO> list = workspaceService.getWorkspacesInProgressByUser(userId);

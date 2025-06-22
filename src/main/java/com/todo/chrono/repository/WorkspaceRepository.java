@@ -19,6 +19,8 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Integer> {
 
     int countByUserId(Integer userId);
 
+    List<Workspace> findAllByUserId(int userId);
+
     @Query(value = "SELECT * FROM workspaces WHERE id = :workspaceId", nativeQuery = true)
     Workspace findWorkspaceById(@Param("workspaceId") Integer workspaceId);
 

@@ -5,6 +5,7 @@ import com.todo.chrono.util.error.IdInvalidException;
 import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.dto.request.UserDTO;
 import com.todo.chrono.dto.request.WorkspaceCreateDTO;
+import com.todo.chrono.dto.request.TaskBriefDTO;
 
 import java.util.List;
 
@@ -22,4 +23,7 @@ public interface WorkspaceService {
     List<WorkspaceDTO> getWorkspaceAll();
     UserDTO getUserIdByWorkspaceId(int workspace_id);
     public int getWorkspaceProgress(int workspaceId) throws IdInvalidException;
+    List<WorkspaceDTO> getWorkspacesInProgressByUser(int userId);
+    
+
 }

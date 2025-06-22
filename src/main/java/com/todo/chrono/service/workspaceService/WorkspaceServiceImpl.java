@@ -1,6 +1,7 @@
 package com.todo.chrono.service.workspaceService;
 
 import com.todo.chrono.util.error.IdInvalidException;
+import com.todo.chrono.dto.request.TaskBriefDTO;
 import com.todo.chrono.dto.request.UserDTO;
 import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.repository.WorkspaceRepository;
@@ -20,7 +21,7 @@ import com.todo.chrono.enums.RoleWorkspaceMember;
 import com.todo.chrono.repository.TaskRepository;
 import com.todo.chrono.enums.TaskStatus;
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -134,6 +135,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         return workspaces.stream().map(
                 (workspace) -> WorkspaceMapper.mapToWorkspaceDTO(workspace)).collect(Collectors.toList());
     }
+
     @Override
     public int getWorkspaceProgress(int workspaceId) throws IdInvalidException {
         if (!workspaceRepository.existsById(workspaceId)) {
@@ -147,4 +149,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         int completedTasks = taskRepository.countByWorkspaceIdAndStatus(workspaceId, TaskStatus.COMPLETED);
         return (int) ((double) completedTasks / totalTasks * 100);
     }
+
+    @Override
+    public List<WorkspaceDTO> getWorkspacesInProgressByUser(int userId) {
+        List<Workspace> userWorkspaces = workspaceRepository.findAllByUserId(userId);
+
+        return userWorkspaces.stream()
+                .filter(ws -> {
+                    int total = taskRepository.countByWorkspaceId(ws.getId());
+                    int done = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
+                    return total > 0 && done < total;
+                })
+                .map(WorkspaceMapper::mapToWorkspaceDTO)
+                .collect(Collectors.toList());
+    }
+    
+
 }

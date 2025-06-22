@@ -5,6 +5,7 @@ import com.todo.chrono.dto.request.UserDTO;
 import com.todo.chrono.dto.request.TaskDTO;
 import com.todo.chrono.dto.request.WorkspaceDTO;
 import com.todo.chrono.repository.WorkspaceRepository;
+import com.todo.chrono.dto.request.TaskBriefDTO;
 import com.todo.chrono.dto.request.TaskCreateDTO;
 import lombok.AllArgsConstructor;
 import com.todo.chrono.entity.Task;
@@ -19,6 +20,8 @@ import java.time.LocalDateTime;
 import com.todo.chrono.enums.TaskStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -135,6 +138,23 @@ public class TaskServiceImpl implements TaskService {
         }
         return tasks.stream()
                 .map(TaskMapper::mapToTaskDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<TaskBriefDTO> getTop5TasksTodoByUserId(int userId) throws IdInvalidException {
+        List<Workspace> workspaces = workspaceRepository.findWorkspacesByUserId(userId);
+        if (workspaces.isEmpty()) {
+            throw new IdInvalidException("User ID " + userId + " không có workspace nào.");
+        }
+    
+        return workspaces.stream()
+                .flatMap(ws -> taskRepository.findAllByWorkspaceId(ws.getId()).stream()
+                    .filter(task -> (task.getStatus() == TaskStatus.PENDING || task.getStatus() == TaskStatus.IN_PROGRESS)
+                            && task.getDueDate() != null)
+                    .map(task -> new TaskBriefDTO(task.getTitle(), ws.getName(), task.getDueDate()))
+                )
+                .sorted(Comparator.comparing(TaskBriefDTO::getDueDate)) // sắp xếp tăng dần
+                .limit(5)
                 .collect(Collectors.toList());
     }
 }

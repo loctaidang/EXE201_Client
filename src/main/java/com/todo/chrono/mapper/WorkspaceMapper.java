@@ -14,7 +14,7 @@ public class WorkspaceMapper {
         workspaceDTO.setDescription(workspace.getDescription());
         workspaceDTO.setStatus(workspace.getStatus());
         workspaceDTO.setCreatedAt(workspace.getCreatedAt());
-        workspaceDTO.setUpdatedAt(workspace.getUpdatedAt());
+        workspaceDTO.setUpdatedAt(workspace.getUpdatedAt());    
         return workspaceDTO;
 
     }

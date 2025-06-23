@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.todo.chrono.enums.WorkspaceStatus;
 @Getter
 @Setter
 @Builder
@@ -21,6 +22,10 @@ public class Workspace {
     private int id;
     @Column(name = "name")
     private String name;
+    @Column(name = "description")
+    private String description;
+    @Enumerated(EnumType.STRING)
+    private WorkspaceStatus status;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")

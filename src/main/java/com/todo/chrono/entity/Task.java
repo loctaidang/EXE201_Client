@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
+
+import com.todo.chrono.enums.TaskPriority;
 import com.todo.chrono.enums.TaskStatus;
 @Getter
 @Setter
@@ -20,8 +22,12 @@ public class Task {
     private int id;
     @Column(name = "title")
     private String title;
+    @Column(name = "description")
+    private String description;
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+    @Enumerated(EnumType.STRING)
+    private TaskPriority priority;
     @Column(name = "due_date")
     private LocalDateTime dueDate;
     @Column(name = "created_at")

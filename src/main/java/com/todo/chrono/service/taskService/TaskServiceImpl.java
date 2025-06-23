@@ -91,6 +91,12 @@ public class TaskServiceImpl implements TaskService {
         if (updateTask.getDueDate() != null) {
             task.setDueDate(updateTask.getDueDate());
         }
+        if (updateTask.getDescription() != null) {
+            task.setDescription(updateTask.getDescription());
+        }
+        if (updateTask.getPriority() != null) {
+            task.setPriority(updateTask.getPriority());
+        }
         Task updateTaskObj = taskRepository.save(task);
         return TaskMapper.mapToTaskDTO(updateTaskObj);
     }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import com.todo.chrono.enums.WorkspaceStatus;
 
 @Getter
 @Setter
@@ -13,9 +14,13 @@ import java.time.LocalDateTime;
 public class WorkspaceDTO {
     private int id;
 
-    private int userId;
+    private UserDTO user;
 
     private String name;
+
+    private String description;
+
+    private WorkspaceStatus status;
 
     private LocalDateTime createdAt;
 

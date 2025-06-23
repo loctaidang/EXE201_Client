@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+
+import com.todo.chrono.entity.Task;
 import com.todo.chrono.enums.TaskStatus;
+import com.todo.chrono.enums.TaskPriority;
 
 @Getter
 @Setter
@@ -14,11 +17,15 @@ import com.todo.chrono.enums.TaskStatus;
 public class TaskDTO {
     private int id;
 
-    private int workspaceId;
+    private WorkspaceDTO workspace;
 
     private String title;
 
     private TaskStatus status;
+
+    private TaskPriority priority;
+
+    private String description;
 
     private LocalDateTime dueDate;
 

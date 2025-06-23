@@ -24,6 +24,10 @@ public interface WorkspaceService {
     UserDTO getUserIdByWorkspaceId(int workspace_id);
     public int getWorkspaceProgress(int workspaceId) throws IdInvalidException;
     List<WorkspaceDTO> getWorkspacesInProgressByUser(int userId);
+    int countCompletedWorkspacesByUser(int userId) throws IdInvalidException;
+    void updateWorkspaceStatusIfNeeded(Integer workspaceId);
+    int countUncompletedWorkspacesByUser(int userId);
+
     
 
 }

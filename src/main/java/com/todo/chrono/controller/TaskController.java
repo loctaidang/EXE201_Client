@@ -88,8 +88,15 @@ public class TaskController {
 
     @GetMapping("/users/{userId}/tasks/top5")
     public ResponseEntity<List<TaskBriefDTO>> getTop5TasksToDo(@PathVariable int userId) throws IdInvalidException {
-            List<TaskBriefDTO> result = taskService.getTop5TasksTodoByUserId(userId);
-            return ResponseEntity.ok(result);        
+        List<TaskBriefDTO> result = taskService.getTop5TasksTodoByUserId(userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/users/{userId}/completed-count")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
+    public ResponseEntity<Integer> countCompletedTasksByUser(@PathVariable int userId) throws IdInvalidException {
+        int count = taskService.countCompletedTasksByUserId(userId);
+        return ResponseEntity.ok(count);
     }
 
 }

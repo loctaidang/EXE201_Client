@@ -98,4 +98,16 @@ public class WorkspaceController {
         }
     }
 
+    @GetMapping("/user/{userId}/completed-count")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FREE', 'PREMIUM')")
+    public ResponseEntity<Integer> countCompletedWorkspacesByUser(@PathVariable int userId) throws IdInvalidException {
+        int count = workspaceService.countCompletedWorkspacesByUser(userId);
+        return ResponseEntity.ok(count);
+    }
+    @GetMapping("/users/{userId}/workspaces/uncompleted-count")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
+    public ResponseEntity<Integer> countUncompletedWorkspaces(@PathVariable int userId) {
+        int count = workspaceService.countUncompletedWorkspacesByUser(userId);
+        return ResponseEntity.ok(count);
+    }
 }

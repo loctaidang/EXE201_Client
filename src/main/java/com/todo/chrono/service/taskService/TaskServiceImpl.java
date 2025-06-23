@@ -19,6 +19,7 @@ import com.todo.chrono.mapper.UserMapper;
 import java.time.LocalDateTime;
 import com.todo.chrono.enums.TaskStatus;
 import org.springframework.stereotype.Service;
+import com.todo.chrono.service.workspaceService.WorkspaceService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,6 +33,8 @@ public class TaskServiceImpl implements TaskService {
 
     private WorkspaceRepository workspaceRepository;
     private TaskRepository taskRepository;
+    private WorkspaceService workspaceService;
+    private UserRepository userRepository;
 
     @Override
     public TaskDTO createTask(TaskCreateDTO taskCreateDTO, Integer workspace_id) throws IdInvalidException {
@@ -59,6 +62,7 @@ public class TaskServiceImpl implements TaskService {
         task.setCreatedAt(LocalDateTime.now());
 
         Task savedTask = taskRepository.save(task);
+        workspaceService.updateWorkspaceStatusIfNeeded(workspace_id);
         return TaskMapper.mapToTaskDTO(savedTask);
     }
 
@@ -98,6 +102,7 @@ public class TaskServiceImpl implements TaskService {
             task.setPriority(updateTask.getPriority());
         }
         Task updateTaskObj = taskRepository.save(task);
+        workspaceService.updateWorkspaceStatusIfNeeded(task.getWorkspace().getId());
         return TaskMapper.mapToTaskDTO(updateTaskObj);
     }
 
@@ -106,6 +111,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(task_id)
                 .orElseThrow(() -> new IdInvalidException("Task với id = " + task_id + " không tồn tại"));
         taskRepository.deleteById(task_id);
+        workspaceService.updateWorkspaceStatusIfNeeded(task.getWorkspace().getId());
     }
 
     @Override
@@ -146,21 +152,31 @@ public class TaskServiceImpl implements TaskService {
                 .map(TaskMapper::mapToTaskDTO)
                 .collect(Collectors.toList());
     }
+
     @Override
     public List<TaskBriefDTO> getTop5TasksTodoByUserId(int userId) throws IdInvalidException {
         List<Workspace> workspaces = workspaceRepository.findWorkspacesByUserId(userId);
         if (workspaces.isEmpty()) {
             throw new IdInvalidException("User ID " + userId + " không có workspace nào.");
         }
-    
+
         return workspaces.stream()
                 .flatMap(ws -> taskRepository.findAllByWorkspaceId(ws.getId()).stream()
-                    .filter(task -> (task.getStatus() == TaskStatus.PENDING || task.getStatus() == TaskStatus.IN_PROGRESS)
-                            && task.getDueDate() != null)
-                    .map(task -> new TaskBriefDTO(task.getTitle(), ws.getName(), task.getDueDate()))
-                )
+                        .filter(task -> (task.getStatus() == TaskStatus.PENDING
+                                || task.getStatus() == TaskStatus.IN_PROGRESS)
+                                && task.getDueDate() != null)
+                        .map(task -> new TaskBriefDTO(task.getTitle(), ws.getName(), task.getDueDate())))
                 .sorted(Comparator.comparing(TaskBriefDTO::getDueDate)) // sắp xếp tăng dần
                 .limit(5)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public int countCompletedTasksByUserId(int userId) throws IdInvalidException {
+        if (!userRepository.existsById(userId)) {
+            throw new IdInvalidException("User với id = " + userId + " không tồn tại");
+        }
+        return taskRepository.countCompletedTasksByUserId(userId);
+    }
+
 }

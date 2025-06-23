@@ -26,4 +26,7 @@ public interface TaskService {
     WorkspaceDTO getWorkspaceIdByTaskId(int task_id) throws IdInvalidException;
     List<TaskDTO> getTasksByWorkspaceIdAndStatus(int workspace_id, TaskStatus status) throws IdInvalidException;
     List<TaskBriefDTO> getTop5TasksTodoByUserId(int userId) throws IdInvalidException;
+
+    int countCompletedTasksByUserId(int userId) throws IdInvalidException;
+
 }

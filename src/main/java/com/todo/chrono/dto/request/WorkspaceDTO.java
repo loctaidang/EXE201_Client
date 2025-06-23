@@ -26,4 +26,6 @@ public class WorkspaceDTO {
 
     private LocalDateTime updatedAt;
 
+    private int progress;
+
 }

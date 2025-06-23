@@ -75,7 +75,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public WorkspaceDTO getWorkspaceById(Integer workspace_id) throws IdInvalidException {
         Optional<Workspace> workspace = workspaceRepository.findById(workspace_id);
         if (workspace.isPresent()) {
-            return WorkspaceMapper.mapToWorkspaceDTO(workspace.get());
+            WorkspaceDTO dto = WorkspaceMapper.mapToWorkspaceDTO(workspace.get());
+            int total = taskRepository.countByWorkspaceId(workspace_id);
+            int completed = taskRepository.countByWorkspaceIdAndStatus(workspace_id, TaskStatus.COMPLETED);
+            int progress = total == 0 ? 0 : (int) ((double) completed / total * 100);
+            dto.setProgress(progress);
+            return dto;
         } else {
             throw new IdInvalidException("Workspace với id = " + workspace_id + " không tồn tại");
         }
@@ -133,8 +138,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         if (workspaces == null) {
             throw new IdInvalidException("Trong User id = " + user_id + " hiện không có workspace");
         }
-        return workspaces.stream().map(
-                (workspace) -> WorkspaceMapper.mapToWorkspaceDTO(workspace)).collect(Collectors.toList());
+        return workspaces.stream().map(ws -> {
+            WorkspaceDTO dto = WorkspaceMapper.mapToWorkspaceDTO(ws);
+            int total = taskRepository.countByWorkspaceId(ws.getId());
+            int completed = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
+            int progress = total == 0 ? 0 : (int) ((double) completed / total * 100);
+            dto.setProgress(progress);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -146,8 +157,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public List<WorkspaceDTO> getWorkspaceAll() {
         List<Workspace> workspaces = workspaceRepository.findAll();
-        return workspaces.stream().map(
-                (workspace) -> WorkspaceMapper.mapToWorkspaceDTO(workspace)).collect(Collectors.toList());
+        return workspaces.stream().map(ws -> {
+            WorkspaceDTO dto = WorkspaceMapper.mapToWorkspaceDTO(ws);
+            int total = taskRepository.countByWorkspaceId(ws.getId());
+            int completed = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
+            int progress = total == 0 ? 0 : (int) ((double) completed / total * 100);
+            dto.setProgress(progress);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -167,14 +184,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public List<WorkspaceDTO> getWorkspacesInProgressByUser(int userId) {
         List<Workspace> userWorkspaces = workspaceRepository.findAllByUserId(userId);
-
         return userWorkspaces.stream()
                 .filter(ws -> {
                     int total = taskRepository.countByWorkspaceId(ws.getId());
                     int done = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
                     return total > 0 && done < total;
                 })
-                .map(WorkspaceMapper::mapToWorkspaceDTO)
+                .map(ws -> {
+                    WorkspaceDTO dto = WorkspaceMapper.mapToWorkspaceDTO(ws);
+                    int total = taskRepository.countByWorkspaceId(ws.getId());
+                    int completed = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
+                    int progress = total == 0 ? 0 : (int) ((double) completed / total * 100);
+                    dto.setProgress(progress);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

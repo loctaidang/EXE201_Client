@@ -20,6 +20,7 @@ import com.todo.chrono.entity.WorkspaceMember;
 import com.todo.chrono.enums.RoleWorkspaceMember;
 import com.todo.chrono.repository.TaskRepository;
 import com.todo.chrono.enums.TaskStatus;
+import com.todo.chrono.enums.WorkspaceStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +106,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             workspace.setDescription(updateWorkspace.getDescription());
         }
         if (updateWorkspace.getStatus() != null) {
+            if (updateWorkspace.getStatus() == WorkspaceStatus.COMPLETED) {
+                int totalTasks = taskRepository.countByWorkspaceId(workspace_id);
+                int completedTasks = taskRepository.countByWorkspaceIdAndStatus(workspace_id, TaskStatus.COMPLETED);
+                if (totalTasks == 0 || completedTasks < totalTasks) {
+                    throw new IdInvalidException("Không thể chuyển sang COMPLETED khi còn task chưa hoàn thành.");
+                }
+            }
             workspace.setStatus(updateWorkspace.getStatus());
         }
         workspace.setUpdatedAt(LocalDateTime.now());
@@ -169,6 +177,51 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 .map(WorkspaceMapper::mapToWorkspaceDTO)
                 .collect(Collectors.toList());
     }
-    
 
+    @Override
+    public int countCompletedWorkspacesByUser(int userId) throws IdInvalidException {
+        List<Workspace> workspaces = workspaceRepository.findWorkspacesByUserId(userId);
+        if (workspaces.isEmpty()) {
+            return 0;
+        }
+
+        int count = 0;
+
+        for (Workspace ws : workspaces) {
+            int total = taskRepository.countByWorkspaceId(ws.getId());
+            int completed = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
+
+            if (total > 0 && total == completed) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public void updateWorkspaceStatusIfNeeded(Integer workspaceId) {
+        int totalTasks = taskRepository.countByWorkspaceId(workspaceId);
+
+        if (totalTasks == 0)
+            return; // Không cập nhật nếu chưa có task
+
+        int completedTasks = taskRepository.countByWorkspaceIdAndStatus(workspaceId, TaskStatus.COMPLETED);
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElse(null);
+
+        if (workspace != null) {
+            if (completedTasks == totalTasks) {
+                workspace.setStatus(WorkspaceStatus.COMPLETED);
+            } else {
+                workspace.setStatus(WorkspaceStatus.PENDING);
+            }
+            workspace.setUpdatedAt(LocalDateTime.now());
+            workspaceRepository.save(workspace);
+        }
+    }
+
+    @Override
+    public int countUncompletedWorkspacesByUser(int userId) {
+        return workspaceRepository.countByUserIdAndStatusNot(userId, WorkspaceStatus.COMPLETED);
+    }
 }

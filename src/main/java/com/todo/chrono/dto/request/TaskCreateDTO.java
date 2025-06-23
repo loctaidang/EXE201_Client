@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import com.todo.chrono.enums.TaskStatus;
+import com.todo.chrono.enums.TaskPriority;
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,6 +15,8 @@ public class TaskCreateDTO {
 
     private String title;
     private TaskStatus status;
+    private String description;
+    private TaskPriority priority;
     private LocalDateTime dueDate;
     
 }

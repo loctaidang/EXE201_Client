@@ -101,6 +101,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             // Cập nhật tên nếu hợp lệ
             workspace.setName(newName);
         }
+        if (updateWorkspace.getDescription() != null) {
+            workspace.setDescription(updateWorkspace.getDescription());
+        }
+        if (updateWorkspace.getStatus() != null) {
+            workspace.setStatus(updateWorkspace.getStatus());
+        }
         workspace.setUpdatedAt(LocalDateTime.now());
         Workspace updateWorkspaceObj = workspaceRepository.save(workspace);
         return WorkspaceMapper.mapToWorkspaceDTO(updateWorkspaceObj);

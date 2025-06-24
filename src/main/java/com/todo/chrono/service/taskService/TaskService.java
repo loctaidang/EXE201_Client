@@ -28,5 +28,7 @@ public interface TaskService {
     List<TaskBriefDTO> getTop5TasksTodoByUserId(int userId) throws IdInvalidException;
 
     int countCompletedTasksByUserId(int userId) throws IdInvalidException;
+    List<TaskDTO> getAllTasksByUserId(int userId) throws IdInvalidException;
+
 
 }

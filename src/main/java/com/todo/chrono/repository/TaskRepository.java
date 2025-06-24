@@ -27,6 +27,9 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
 
     int countByWorkspaceIdAndStatus(int workspaceId, TaskStatus status);
 
+    @Query("SELECT t FROM Task t WHERE t.workspace.user.id = :userId")
+    List<Task> findAllByUserId(@Param("userId") int userId);
+
     @Query("SELECT COUNT(t) FROM Task t JOIN t.workspace w JOIN w.workspaceMembers wm " +
             "WHERE wm.user.id = :userId AND t.status = com.todo.chrono.enums.TaskStatus.COMPLETED")
     int countCompletedTasksByUserId(@Param("userId") int userId);

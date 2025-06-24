@@ -178,5 +178,14 @@ public class TaskServiceImpl implements TaskService {
         }
         return taskRepository.countCompletedTasksByUserId(userId);
     }
-
+    @Override
+    public List<TaskDTO> getAllTasksByUserId(int userId) throws IdInvalidException {
+        List<Task> tasks = taskRepository.findAllByUserId(userId);
+        if (tasks.isEmpty()) {
+            throw new IdInvalidException("User id = " + userId + " không có task nào.");
+        }
+        return tasks.stream()
+                .map(TaskMapper::mapToTaskDTO)
+                .collect(Collectors.toList());
+    }
 }

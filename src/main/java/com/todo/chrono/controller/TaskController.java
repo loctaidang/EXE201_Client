@@ -98,5 +98,14 @@ public class TaskController {
         int count = taskService.countCompletedTasksByUserId(userId);
         return ResponseEntity.ok(count);
     }
-
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('FREE', 'PREMIUM','ADMIN')")
+    public ResponseEntity<List<TaskDTO>> getAllTasksByUserId(@PathVariable int userId) {
+        try {
+            List<TaskDTO> result = taskService.getAllTasksByUserId(userId);
+            return ResponseEntity.ok(result);
+        } catch (IdInvalidException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }

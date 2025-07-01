@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
-
+import java.util.List;
 import com.todo.chrono.entity.Task;
 import com.todo.chrono.enums.TaskStatus;
 import com.todo.chrono.enums.TaskPriority;
+
 
 @Getter
 @Setter
@@ -30,5 +31,6 @@ public class TaskDTO {
     private LocalDateTime dueDate;
 
     private LocalDateTime createdAt;
-
+    
+    private List<UserDTO> assignees;
 }

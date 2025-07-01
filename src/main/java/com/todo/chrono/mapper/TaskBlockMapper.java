@@ -21,7 +21,7 @@ import com.todo.chrono.dto.request.TaskBlockCreateDTO;
                 .build();
     }
 
-    public static TaskBlock toEntity(TaskBlockDTO dto, Task task) {
+    public static TaskBlock toEntity(TaskBlockDTO dto, Task task)    {
         return TaskBlock.builder()
                 .id(dto.getId())
                 .task(task)

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.todo.chrono.enums.RoleWorkspaceMember;
 import com.todo.chrono.enums.TaskStatus;
+import com.todo.chrono.util.AccountUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,12 +27,21 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     private final WorkspaceRepository workspaceRepository;
     private final UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final com.todo.chrono.util.AccountUtil accountUtil;
+    private final AccountUtil accountUtil;
     private final TaskRepository taskRepository;
 
     @Override
     public WorkspaceMemberDTO addMemberToWorkspace(Integer workspaceId, Integer userId)
             throws IdInvalidException {
+
+        // Lấy user hiện tại (người muốn mời)
+        User currentUser = accountUtil.getCurrentUser();
+
+        // Kiểm tra premium còn hiệu lực
+        if (currentUser.getPremiumExpiry() == null
+                || currentUser.getPremiumExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new IdInvalidException("Chỉ người dùng Premium mới có thể thêm thành viên vào workspace.");
+        }
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IdInvalidException("Workspace ID không hợp lệ"));
@@ -47,7 +57,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
         WorkspaceMember member = new WorkspaceMember();
         member.setWorkspace(workspace);
         member.setUser(user);
-        member.setRole(RoleWorkspaceMember.MEMBER); // ✅ Mặc định là MEMBER
+        member.setRole(RoleWorkspaceMember.MEMBER);
         member.setJoinedAt(java.time.LocalDateTime.now());
 
         WorkspaceMember saved = workspaceMemberRepository.save(member);
@@ -74,7 +84,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
                 .orElseThrow(() -> new IdInvalidException("Người dùng không phải thành viên workspace"));
 
         if (currentUserMember.getRole() != RoleWorkspaceMember.OWNER) {
-            throw new IdInvalidException("Chỉ OWNER mới có quyền thay đổi vai trò thành viên.");
+            throw new IdInvalidException("Chỉ OWNER mới có quyền cập nhật thông tin workspace.");
         }
 
         if (newRole == RoleWorkspaceMember.OWNER) {
@@ -131,7 +141,5 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
 
         workspaceMemberRepository.delete(member);
     }
-
-   
 
 }

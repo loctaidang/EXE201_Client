@@ -21,6 +21,7 @@ import com.todo.chrono.enums.RoleWorkspaceMember;
 import com.todo.chrono.repository.TaskRepository;
 import com.todo.chrono.enums.TaskStatus;
 import com.todo.chrono.enums.WorkspaceStatus;
+import com.todo.chrono.util.AccountUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final TaskRepository taskRepository;
+    private final AccountUtil accountUtil;
 
     @Override
     public WorkspaceDTO createWorkspace(WorkspaceCreateDTO workspaceCreateDTO, Integer user_id)
@@ -90,26 +92,39 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public WorkspaceDTO updateWorkspace(WorkspaceCreateDTO updateWorkspace, Integer workspace_id)
             throws IdInvalidException {
+        // 1. Tìm workspace
         Workspace workspace = workspaceRepository.findById(workspace_id)
                 .orElseThrow(() -> new IdInvalidException("Workspace với id = " + workspace_id + " không tồn tại"));
 
+        // 2. Lấy user hiện tại
+        User currentUser = accountUtil.getCurrentUser();
+
+        // 3. Kiểm tra quyền OWNER
+        WorkspaceMember member = workspaceMemberRepository
+                .findByWorkspaceIdAndUserId(workspace_id, currentUser.getId())
+                .orElseThrow(() -> new IdInvalidException("Bạn không phải thành viên của workspace này"));
+
+        if (member.getRole() != RoleWorkspaceMember.OWNER) {
+            throw new IdInvalidException("Chỉ OWNER mới có quyền chỉnh sửa workspace.");
+        }
+
+        // 4. Xử lý cập nhật
         String newName = updateWorkspace.getName();
         String currentName = workspace.getName();
 
         if (newName != null) {
-            // Nếu tên mới khác tên hiện tại và đã tồn tại tên này trong workspace của user
             if (!newName.equals(currentName)
                     && workspaceRepository.existsByUserIdAndName(workspace.getUser().getId(), newName)) {
                 throw new IdInvalidException("Workspace với tên = " + newName + " đã tồn tại trong User id = "
                         + workspace.getUser().getId());
             }
-
-            // Cập nhật tên nếu hợp lệ
             workspace.setName(newName);
         }
+
         if (updateWorkspace.getDescription() != null) {
             workspace.setDescription(updateWorkspace.getDescription());
         }
+
         if (updateWorkspace.getStatus() != null) {
             if (updateWorkspace.getStatus() == WorkspaceStatus.COMPLETED) {
                 int totalTasks = taskRepository.countByWorkspaceId(workspace_id);
@@ -120,30 +135,52 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             }
             workspace.setStatus(updateWorkspace.getStatus());
         }
+
         workspace.setUpdatedAt(LocalDateTime.now());
-        Workspace updateWorkspaceObj = workspaceRepository.save(workspace);
-        return WorkspaceMapper.mapToWorkspaceDTO(updateWorkspaceObj);
+        Workspace updated = workspaceRepository.save(workspace);
+
+        return WorkspaceMapper.mapToWorkspaceDTO(updated);
     }
 
     @Override
     public void deleteWorkspace(Integer workspace_id) throws IdInvalidException {
+        // 1. Tìm workspace
         Workspace workspace = workspaceRepository.findById(workspace_id)
                 .orElseThrow(() -> new IdInvalidException("Workspace với id = " + workspace_id + " không tồn tại"));
+
+        // 2. Lấy user hiện tại
+        User currentUser = accountUtil.getCurrentUser();
+
+        // 3. Kiểm tra xem user có phải thành viên và là OWNER hay không
+        WorkspaceMember member = workspaceMemberRepository
+                .findByWorkspaceIdAndUserId(workspace_id, currentUser.getId())
+                .orElseThrow(() -> new IdInvalidException("Bạn không phải thành viên của workspace này"));
+
+        if (member.getRole() != RoleWorkspaceMember.OWNER) {
+            throw new IdInvalidException("Chỉ OWNER mới có quyền xóa workspace.");
+        }
+
+        // 4. Xóa workspace
         workspaceRepository.deleteById(workspace_id);
     }
 
     @Override
-    public List<WorkspaceDTO> getWorkspacesByUserId(int user_id) throws IdInvalidException {
-        List<Workspace> workspaces = workspaceRepository.findWorkspacesByUserId(user_id);
-        if (workspaces == null) {
-            throw new IdInvalidException("Trong User id = " + user_id + " hiện không có workspace");
+    public List<WorkspaceDTO> getWorkspacesByUserId(int userId) throws IdInvalidException {
+        List<WorkspaceMember> memberEntries = workspaceMemberRepository.findByUserId(userId);
+
+        if (memberEntries.isEmpty()) {
+            throw new IdInvalidException("User id = " + userId + " hiện không là thành viên của bất kỳ workspace nào");
         }
-        return workspaces.stream().map(ws -> {
+
+        return memberEntries.stream().map(member -> {
+            Workspace ws = member.getWorkspace();
             WorkspaceDTO dto = WorkspaceMapper.mapToWorkspaceDTO(ws);
+
             int total = taskRepository.countByWorkspaceId(ws.getId());
             int completed = taskRepository.countByWorkspaceIdAndStatus(ws.getId(), TaskStatus.COMPLETED);
             int progress = total == 0 ? 0 : (int) ((double) completed / total * 100);
             dto.setProgress(progress);
+
             return dto;
         }).collect(Collectors.toList());
     }

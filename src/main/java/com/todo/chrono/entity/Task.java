@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.todo.chrono.enums.TaskPriority;
 import com.todo.chrono.enums.TaskStatus;
+
 @Getter
 @Setter
 @Builder
@@ -32,8 +34,12 @@ public class Task {
     private LocalDateTime dueDate;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    //relationship
+    // relationship
     @ManyToOne
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<TaskAssignee> assignees;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<TaskBlock> blocks;
 }

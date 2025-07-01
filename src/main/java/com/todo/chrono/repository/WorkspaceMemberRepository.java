@@ -10,4 +10,5 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
     boolean existsByWorkspaceIdAndUserId(Integer workspaceId, Integer userId);
     Optional<WorkspaceMember> findByWorkspaceIdAndUserId(Integer workspaceId, Integer userId);
     List<WorkspaceMember> findByWorkspaceId(Integer workspaceId);
+    List<WorkspaceMember> findByUserId(Integer userId);
 }

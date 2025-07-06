@@ -42,8 +42,8 @@ public class SecurityConfiguration {
             "/swagger-resources/**",
 //            "/ws/**",  // Bỏ qua authentication cho WebSocket
 //            "/topic/**",  // Cho phép client subscribe
-            "/app/**"
-
+            "/app/**",
+            "/api/health"
 
     };
 

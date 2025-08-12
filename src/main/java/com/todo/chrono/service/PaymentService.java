@@ -206,7 +206,7 @@ public class PaymentService {
         payment.setTotalMoney(subscriptionPlan.getPrice());
         payment.setPaidAt(LocalDateTime.now());
         payment.setPaymentStatus(paymentStatus);
-        payment.setPaymentMethod("VNPAY");
+        payment.setPaymentMethod("MOMO");
 
         paymentRepository.save(payment);
     }

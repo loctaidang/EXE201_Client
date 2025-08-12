@@ -74,7 +74,7 @@ public class PaymentService {
         // String returnUrl = "http://159.223.39.71?student_id=" +
         // rechargeRequestDTO.getStudent_id() + "&course_id=" +
         // rechargeRequestDTO.getCourse_id();
-        String returnUrl = "https://www.exe201.space/home/PageProListPage"
+        String returnUrl = "https://www.chronobuddy.live/home/PageProListPage"
                 + "?userId=" + rechargeRequestDTO.getUserId()
                 + "&subscriptionPlanId=" + rechargeRequestDTO.getSubscriptionPlanId();
 
@@ -174,7 +174,7 @@ public class PaymentService {
                 payment.setTotalMoney(subscriptionPlan.getPrice());
                 payment.setPaidAt(LocalDateTime.now());
                 payment.setPaymentStatus(PaymentStatus.FAILED); // Hoặc thêm enum STATUS_DUPLICATE
-                payment.setPaymentMethod("VNPAY");
+                payment.setPaymentMethod("MOMO");
                 paymentRepository.save(payment);
 
                 throw new RuntimeException("Tài khoản đã là PREMIUM, không thể nâng cấp thêm lần nữa.");

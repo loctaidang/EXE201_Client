@@ -20,7 +20,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 AND FUNCTION('MONTH', p.paidAt) = :month
                 AND FUNCTION('DAY', p.paidAt) = :day
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getTotalRevenueByDay(@Param("year") int year, @Param("month") int month, @Param("day") int day);
 
@@ -30,7 +30,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 WHERE FUNCTION('YEAR', p.paidAt) = :year
                 AND FUNCTION('MONTH', p.paidAt) = :month
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getTotalRevenueByMonth(@Param("year") int year, @Param("month") int month);
 
@@ -39,7 +39,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 SELECT COALESCE(SUM(p.totalMoney), 0) FROM Payment p
                 WHERE FUNCTION('YEAR', p.paidAt) = :year
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getTotalRevenueByYear(@Param("year") int year);
 
@@ -48,7 +48,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 SELECT COALESCE(SUM(p.totalMoney), 0) FROM Payment p
                 WHERE DATE(p.paidAt) BETWEEN :startDate AND :endDate
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getTotalRevenueBetweenDates(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
@@ -57,7 +57,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     @Query("""
                 SELECT COALESCE(SUM(p.totalMoney), 0) FROM Payment p
                 WHERE p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
                 AND p.subscriptionPlan.id = :subscriptionPlanId
                 AND DATE(p.paidAt) BETWEEN :startDate AND :endDate
             """)
@@ -73,7 +73,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 AND FUNCTION('DAY', p.paidAt) = :day
                 AND p.subscriptionPlan.id = :subscriptionPlanId
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getRevenueBySubscriptionPlanAndDay(
             @Param("subscriptionPlanId") int subscriptionPlanId,
@@ -87,7 +87,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 AND FUNCTION('MONTH', p.paidAt) = :month
                 AND p.subscriptionPlan.id = :subscriptionPlanId
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getRevenueBySubscriptionPlanAndMonth(
             @Param("subscriptionPlanId") int subscriptionPlanId,
@@ -99,7 +99,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 WHERE FUNCTION('YEAR', p.paidAt) = :year
                 AND p.subscriptionPlan.id = :subscriptionPlanId
                 AND p.paymentStatus = 'PAID'
-                AND p.paymentMethod = 'VNPAY'
+                AND p.paymentMethod = 'MOMO'
             """)
     BigDecimal getRevenueBySubscriptionPlanAndYear(
             @Param("subscriptionPlanId") int subscriptionPlanId,

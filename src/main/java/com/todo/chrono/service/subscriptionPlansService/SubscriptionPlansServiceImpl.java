@@ -48,7 +48,7 @@ public class SubscriptionPlansServiceImpl implements SubscriptionPlansService {
 
     @Override
     public List<SubscriptionPlansDTO> getSubscriptionPlansAll() {
-        List<SubscriptionPlans> subscriptionPlans = subscriptionPlansRepository.findAll();
+        List<SubscriptionPlans> subscriptionPlans = subscriptionPlansRepository.findByIsDeletedFalse();
         return subscriptionPlans.stream()
                 .map(SubscriptionPlansMapper::mapToSubscriptionPlansDTO)
                 .collect(Collectors.toList());
@@ -88,7 +88,8 @@ public class SubscriptionPlansServiceImpl implements SubscriptionPlansService {
                 .orElseThrow(
                         () -> new IdInvalidException("Subscription plan với id = " + subscription_plans_id
                                 + " không tồn tại hoặc đã bị xóa"));
-        subscriptionPlansRepository.delete(subscriptionPlans);
+        subscriptionPlans.setIsDeleted(true); // đánh dấu xóa mềm
+        subscriptionPlansRepository.save(subscriptionPlans);
     }
-
+    
 }

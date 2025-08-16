@@ -31,6 +31,7 @@ public class SubscriptionPlansMapper {
         subscriptionPlans.setDescription(subscriptionPlansCreateDTO.getDescription());
         subscriptionPlans.setPrice(subscriptionPlansCreateDTO.getPrice());
         subscriptionPlans.setDurationDays(subscriptionPlansCreateDTO.getDurationDays());
+        subscriptionPlans.setIsDeleted(false);
         return subscriptionPlans;
     }
 }

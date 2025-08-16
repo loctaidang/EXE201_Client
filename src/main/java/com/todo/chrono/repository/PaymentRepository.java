@@ -111,8 +111,14 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                 ORDER BY p.paidAt DESC
             """)
     List<Payment> findPaymentsByUserId(@Param("userId") int userId);
-    
-    List<Payment> findByUserIdOrderByPaidAtDesc(Integer userId);
 
+    List<Payment> findByUserIdOrderByPaidAtDesc(Integer userId);
+    
+    @Query("""
+       SELECT p FROM Payment p
+       LEFT JOIN FETCH p.user
+       LEFT JOIN FETCH p.subscriptionPlan
+       """)
+List<Payment> findAllWithDeletedPlans();
 
 }

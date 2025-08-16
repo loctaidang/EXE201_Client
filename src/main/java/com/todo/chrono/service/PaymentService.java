@@ -250,6 +250,23 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
+    public List<PaymentHistoryDTO> getAllPaymentHistory() {
+        return paymentRepository.findAllWithDeletedPlans().stream()
+                .map(p -> new PaymentHistoryDTO(
+                        p.getId(),
+                        p.getSubscriptionPlan() != null 
+                            ? p.getSubscriptionPlan().getName() 
+                            : "[Gói đã xóa]",
+                        p.getTotalMoney(),
+                        p.getPaymentMethod(),
+                        p.getPaymentStatus(),
+                        p.getPaidAt(),
+                        p.getUser().getId(),
+                        p.getUser().getUsername()
+                ))
+                .toList();
+    }
+
     
 
     // public List<PaymentDTO> getPaymetsByUserId(int user_id) throws

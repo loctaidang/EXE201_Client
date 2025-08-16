@@ -53,6 +53,10 @@ public class PaymentMapper {
         dto.setPaymentMethod(payment.getPaymentMethod());
         dto.setPaymentStatus(payment.getPaymentStatus());
         dto.setPaidAt(payment.getPaidAt());
+        if (payment.getUser() != null) {
+            dto.setUserId(payment.getUser().getId());
+            dto.setUsername(payment.getUser().getUsername());
+        }
         return dto;
     }
 }

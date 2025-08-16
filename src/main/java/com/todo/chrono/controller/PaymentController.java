@@ -115,6 +115,11 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/history")
+    public List<PaymentHistoryDTO> getAllPaymentHistory() {
+        return paymentService.getAllPaymentHistory();
+    }
+
     // @GetMapping("/user/{user_id}")
     // @PreAuthorize("hasAnyRole('PARENT','MANAGER')")
     // public ResponseEntity <List<PaymentDTO>>getTopicByChapterId

@@ -26,6 +26,8 @@ public class SubscriptionPlans {
     private double price;
     @Column(name = "duration_days")
     private int durationDays;    
+    @Column(name = "is_deleted",nullable = false)
+    private Boolean isDeleted;
     
     //relationship
     @OneToMany(mappedBy = "subscriptionPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

@@ -17,4 +17,6 @@ public class PaymentHistoryDTO  {
     private String paymentMethod;
     private PaymentStatus paymentStatus;
     private LocalDateTime paidAt;
+    private int userId;
+    private String username;
 }
